@@ -5,8 +5,11 @@ import Signup from './pages/Signup';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Instruction from './pages/Instruction';
+import FAQ from './pages/FAQ';
+import ContactUs from './pages/ContactUs';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/Sidebar';
+
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
@@ -29,6 +32,8 @@ function App() {
                     <Route index element={<Home />} /> 
                     <Route path="profile" element={<Profile />} />
                     <Route path="instruction" element={<Instruction />} />
+                     <Route path="ContactUs" element={<ContactUs />} />
+                    <Route path="FAQ" element={<FAQ />} />
                   </Routes>
                 </div>
               </div>
