@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
+import ContactUs from './pages/ContactUs';
 import Instruction from './pages/Instruction';
 import FAQ from './pages/FAQ';
 import ContactUs from './pages/ContactUs';
@@ -34,6 +35,7 @@ function App() {
                     <Route path="instruction" element={<Instruction />} />
                      <Route path="ContactUs" element={<ContactUs />} />
                     <Route path="FAQ" element={<FAQ />} />
+                
                   </Routes>
                 </div>
               </div>
