@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
+import ContactUs from './pages/ContactUs';
 import Instruction from './pages/Instruction';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/Sidebar';
@@ -27,8 +28,9 @@ function App() {
                 <div className="p-3 flex-grow-1">
                   <Routes>
                     <Route index element={<Home />} /> 
-                    <Route path="profile" element={<Profile />} />
-                    <Route path="instruction" element={<Instruction />} />
+                    <Route path="Profile" element={<Profile />} />
+                    <Route path="Instruction" element={<Instruction />} />
+                    <Route path="Contact Us" element={<ContactUs />} />
                   </Routes>
                 </div>
               </div>
