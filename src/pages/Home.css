@@ -1,0 +1,170 @@
+.home-page {
+  font-family: Arial, sans-serif;
+}
+
+/* this is for top part "Hero title*/
+.hero-section {
+  background: linear-gradient(135deg, #dc3545, #c82333);
+  color: white;
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.hero-section h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.hero-section p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+}
+
+.donate-button {
+  background-color: white;
+  color: #dc3545;
+  border: none;
+  padding: 15px 30px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.donate-button:hover {
+  background-color: #f8f9fa;
+  transform: translateY(-2px);
+}
+
+/*top part ends and start Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 50px 20px;
+}
+
+.section-title {
+  margin-bottom: 30px;
+  color: #333;
+}
+
+/* Blood Cards , under part */
+.blood-cards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.blood-card {
+  flex: 1;
+  min-width: 200px;
+  padding: 30px 20px;
+  text-align: center;
+  border-radius: 8px;
+  border: 2px solid;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.blood-card h5 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.blood-card p {
+  margin-bottom: 10px;
+}
+
+.blood-card strong {
+  font-size: 1.2rem;
+}
+
+
+.urgent {
+  border-color: #dc3545;
+  background-color: #fff5f5;
+}
+
+.low {
+  border-color: #ffc107;
+  background-color: #fffbf0;
+}
+
+.good {
+  border-color: #28a745;
+  background-color: #f8fff8;
+}
+
+.normal {
+  border-color: #007bff;
+  background-color: #f0f8ff;
+}
+
+
+.eligibility-section {
+  background-color: #f8f9fa;
+  padding: 40px;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.eligibility-section p {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+
+.button {
+  border: none;
+  padding: 12px 25px;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 10px;
+  transition: all 0.3s ease;
+}
+
+.yes-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.yes-button:hover {
+  background-color: #218838;
+}
+
+.no-button {
+  background-color: #dc3545;
+  color: white;
+}
+
+.no-button:hover {
+  background-color: #c82333;
+}
+
+.check-button {
+  background-color: #007bff;
+  color: white;
+  margin-top: 20px;
+}
+
+.check-button:hover {
+  background-color: #0056b3;
+}
+
+
+@media (max-width: 768px) {
+  .hero-section h1 {
+    font-size: 2rem;
+  }
+  
+  .blood-cards {
+    flex-direction: column;
+  }
+  
+  .eligibility-section {
+    padding: 20px;
+  }
+}
