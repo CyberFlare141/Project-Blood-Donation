@@ -6,8 +6,11 @@ import Home from './pages/Home';
 import Profile from './pages/Profile';
 import ContactUs from './pages/ContactUs';
 import Instruction from './pages/Instruction';
+import FAQ from './pages/FAQ';
+import ContactUs from './pages/ContactUs';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/Sidebar';
+
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
@@ -28,9 +31,11 @@ function App() {
                 <div className="p-3 flex-grow-1">
                   <Routes>
                     <Route index element={<Home />} /> 
-                    <Route path="Profile" element={<Profile />} />
-                    <Route path="Instruction" element={<Instruction />} />
-                    <Route path="Contact Us" element={<ContactUs />} />
+                    <Route path="profile" element={<Profile />} />
+                    <Route path="instruction" element={<Instruction />} />
+                     <Route path="ContactUs" element={<ContactUs />} />
+                    <Route path="FAQ" element={<FAQ />} />
+                
                   </Routes>
                 </div>
               </div>
