@@ -57,14 +57,6 @@ function Sidebar({ onLogout }) {
           {!collapsed && <span className="nav-text">Instruction</span>}
         </Link>
 
-        <Link 
-          to="/articles" 
-          className={location.pathname === "/articles" ? "nav-link active" : "nav-link"}
-        >
-          <span className="nav-icon">📄</span>
-          {!collapsed && <span className="nav-text">My Articles</span>}
-        </Link>
-
         <button
           className="logout-btn"
           onClick={onLogout}
