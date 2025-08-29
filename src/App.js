@@ -7,7 +7,6 @@ import Profile from './pages/Profile';
 import ContactUs from './pages/ContactUs';
 import Instruction from './pages/Instruction';
 import FAQ from './pages/FAQ';
-import ContactUs from './pages/ContactUs';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/Sidebar';
 
