@@ -1,47 +1,61 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useContext } from "react";
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) setUser(JSON.parse(storedUser));
-  }, []);
+  const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000";
 
-  const login = (email, password) => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const found = users.find(u => u.email === email && u.password === password);
-    if (found) {
-      localStorage.setItem('user', JSON.stringify(found));
-      setUser(found);
+  const signup = async (name, email, password) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data?.message || "Signup failed");
+        return false;
+      }
+      setUser(data.user);
       return true;
+    } catch (e) {
+      console.error("Signup failed:", e);
+      alert("Signup failed");
+      return false;
     }
-    return false;
   };
 
-  const signup = (name, email, password) => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const newUser = { name, email, password, joined: new Date().toLocaleDateString() };
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-    localStorage.setItem('user', JSON.stringify(newUser));
-    setUser(newUser);
+  const login = async (email, password) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data?.message || "Login failed");
+        return false;
+      }
+      setUser(data.user);
+      return true;
+    } catch (e) {
+      console.error("Login failed:", e);
+      alert("Login failed");
+      return false;
+    }
   };
 
-  const logout = () => {
-    localStorage.removeItem('user');
-    setUser(null);
-  };
+  const logout = () => setUser(null);
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, signup, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
+export const useAuth = () => useContext(AuthContext);
