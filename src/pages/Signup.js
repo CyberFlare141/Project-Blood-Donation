@@ -10,11 +10,14 @@ function Signup() {
   const { signup } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    signup(name, email, password);
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  const success = await signup(name, email, password);
+  if (success) {
     navigate('/');
-  };
+  }
+};
+
 
   return (
     <Card className="p-4" style={{ maxWidth: "400px", margin: "100px auto" }}>
