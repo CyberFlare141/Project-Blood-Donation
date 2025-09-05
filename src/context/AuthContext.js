@@ -14,16 +14,20 @@ export const AuthProvider = ({ children }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
+
       const data = await res.json();
+      console.log("Signup response:", res.status, data);
+
       if (!res.ok) {
         alert(data?.message || "Signup failed");
         return false;
       }
+
       setUser(data.user);
       return true;
     } catch (e) {
       console.error("Signup failed:", e);
-      alert("Signup failed");
+      alert("Signup failed (network/server error)");
       return false;
     }
   };
@@ -35,16 +39,20 @@ export const AuthProvider = ({ children }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
+
       const data = await res.json();
+      console.log("Login response:", res.status, data);
+
       if (!res.ok) {
         alert(data?.message || "Login failed");
         return false;
       }
+
       setUser(data.user);
       return true;
     } catch (e) {
       console.error("Login failed:", e);
-      alert("Login failed");
+      alert("Login failed (network/server error)");
       return false;
     }
   };
