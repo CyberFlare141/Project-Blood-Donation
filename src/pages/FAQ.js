@@ -1,7 +1,7 @@
-// src/pages/FAQ.js
+
 import React from "react";
 import { Accordion, Container, Row, Col } from "react-bootstrap";
-import './FAQ.css'; // Custom CSS for styling
+import './Faq.css'; 
 
 const faqs = [
   { question: "Can I donate blood if I have a tattoo?", answer: "Yes, but you may need to wait for a certain period depending on your location." },

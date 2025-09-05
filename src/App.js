@@ -4,12 +4,11 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
-import ContactUs from './pages/ContactUs';
 import Instruction from './pages/Instruction';
 import FAQ from './pages/FAQ';
+import ContactUs from './pages/ContactUs';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/Sidebar';
-
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
@@ -23,23 +22,26 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/*" element={
-            <PrivateRoute>
-              <div className="d-flex">
-                <Sidebar />
-                <div className="p-3 flex-grow-1">
-                  <Routes>
-                    <Route index element={<Home />} /> 
-                    <Route path="profile" element={<Profile />} />
-                    <Route path="instruction" element={<Instruction />} />
-                     <Route path="ContactUs" element={<ContactUs />} />
-                    <Route path="FAQ" element={<FAQ />} />
-                
-                  </Routes>
+
+          <Route
+            path="/*"
+            element={
+              <PrivateRoute>
+                <div style={{ display: 'flex' }}>
+                  <Sidebar />
+                  <div style={{ flex: 1, padding: '16px' }}>
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/profile" element={<Profile />} />
+                      <Route path="/instruction" element={<Instruction />} />
+                      <Route path="/contactus" element={<ContactUs />} />
+                      <Route path="/faq" element={<FAQ />} />
+                    </Routes>
+                  </div>
                 </div>
-              </div>
-            </PrivateRoute>
-          } />
+              </PrivateRoute>
+            }
+          />
         </Routes>
       </Router>
     </AuthProvider>
