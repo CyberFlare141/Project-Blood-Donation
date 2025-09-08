@@ -5,8 +5,8 @@ const requestSchema = new mongoose.Schema({
   hospitalName: { type: String, required: true },
   city: { type: String, required: true },
   bloodType: { type: String, required: true },
-  date: { type: String, required: true },
-  time: { type: String, required: true },
+  date: { type: String, required: true }, 
+  time: { type: String, required: true },  
   contactNumber: { type: String, required: true },
 });
 

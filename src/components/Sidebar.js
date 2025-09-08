@@ -63,12 +63,19 @@ function Sidebar({ onLogout }) {
           <span className="nav-icon">📘</span>
           {!collapsed && <span className="nav-text">ContactUS</span>}
         </Link>
-               <Link 
+          <Link 
           to="/FAQ" 
           className={location.pathname === "/FAQ" ? "nav-link active" : "nav-link"}
         >
           <span className="nav-icon">📘</span>
           {!collapsed && <span className="nav-text">FAQ</span>}
+        </Link>
+        <Link 
+          to="/BloodRequestForm" 
+          className={location.pathname === "/BloodRequestForm" ? "nav-link active" : "nav-link"}
+        >
+          <span className="nav-icon">📘</span>
+          {!collapsed && <span className="nav-text">BloodRequestForm</span>}
         </Link>
 
         <button

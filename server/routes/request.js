@@ -3,7 +3,6 @@ import Request from "../models/Request.js";
 
 const router = express.Router();
 
-
 router.post("/", async (req, res) => {
   try {
     const { patientName, hospitalName, city, bloodType, date, time, contactNumber } = req.body;
@@ -14,7 +13,6 @@ router.post("/", async (req, res) => {
     res.status(500).json({ error: "Failed to create blood request" });
   }
 });
-
 
 router.get("/", async (req, res) => {
   try {
