@@ -12,7 +12,11 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const ok = await login(email, password);
-    if (ok) navigate('/');
+    if (ok) {
+      // After successful login:
+      login(ok); // ok is what you want to store (e.g., user object or token)
+      navigate('/');
+    }
   };
 
   return (
