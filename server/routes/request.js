@@ -5,21 +5,20 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   try {
-    const { patientName, hospitalName, city, bloodType, date, time, contactNumber } = req.body;
-    const newRequest = new Request({ patientName, hospitalName, city, bloodType, date, time, contactNumber });
-    await newRequest.save();
-    res.status(201).json({ message: "Blood request created successfully", request: newRequest });
+    const request = new Request(req.body);
+    await request.save();
+    res.status(201).json(request);
   } catch (err) {
-    res.status(500).json({ error: "Failed to create blood request" });
+    res.status(400).json({ error: err.message });
   }
 });
 
 router.get("/", async (req, res) => {
   try {
-    const requests = await Request.find();
+    const requests = await Request.find().sort({ createdAt: -1 });
     res.json(requests);
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch requests" });
+    res.status(500).json({ error: err.message });
   }
 });
 

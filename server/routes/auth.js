@@ -1,13 +1,14 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import User from "../models/User.js";
+import Request from "../models/Request.js";
 
 const router = express.Router();
 
 
 router.post("/signup", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone = "", profilePic = "" } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -18,12 +19,12 @@ router.post("/signup", async (req, res) => {
     }
 
     const hashed = await bcrypt.hash(password, 10);
-    const user = new User({ name, email, password: hashed });
+    const user = new User({ name, email, password: hashed, phone, profilePic });
     await user.save();
 
     res.status(201).json({
       message: "Signup successful",
-      user: { id: user._id, name: user.name, email: user.email },
+      user: { _id: user._id, name: user.name, email: user.email, phone: user.phone, profilePic: user.profilePic },
     });
   } catch (err) {
     console.error("Signup error:", err);
@@ -51,11 +52,55 @@ router.post("/login", async (req, res) => {
 
     res.json({
       message: "Login successful",
-      user: { id: user._id, name: user.name, email: user.email },
+      user: { _id: user._id, name: user.name, email: user.email },
     });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.post("/", async (req, res) => {
+  try {
+    const request = new Request(req.body);
+    await request.save();
+    res.status(201).json(request);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.get("/", async (req, res) => {
+  try {
+    const requests = await Request.find().sort({ createdAt: -1 });
+    res.json(requests);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+router.get("/profile/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("-password");
+    res.json(user);
+  } catch (err) {
+    res.status(404).json({ error: "User not found" });
+  }
+});
+
+
+router.put("/profile/:id", async (req, res) => {
+  try {
+    const { name, phone, profilePic } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { name, phone, profilePic },
+      { new: true }
+    ).select("-password");
+    res.json(user);
+  } catch (err) {
+    res.status(400).json({ error: "Failed to update profile" });
   }
 });
 

@@ -10,6 +10,7 @@ import ContactUs from './pages/ContactUs';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/Sidebar';
 import BloodRequestForm from './pages/BloodRequestForm';
+import Dashboard from './pages/Dashboard';
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
@@ -34,6 +35,7 @@ function App() {
                     <Routes>
                       <Route path="/" element={<Home />} />
                       <Route path="/profile" element={<Profile />} />
+                      <Route path="/dashboard" element={<Dashboard />} />
                       <Route path="/instruction" element={<Instruction />} />
                       <Route path="/contactus" element={<ContactUs />} />
                       <Route path="/BloodRequestForm" element={<BloodRequestForm />} />

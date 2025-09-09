@@ -1,13 +1,18 @@
-import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import profilePic from "../assets/profile.jpg";
-import "./Sidebar.css"
+import React, { useState } from 'react';
+import "./Sidebar.css";
 import { useAuth } from '../context/AuthContext';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
-function Sidebar({ onLogout }) {
-  const { user } = useAuth();
+function Sidebar() {
+  const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
     <div className={`sidebar ${collapsed ? "collapsed" : ""}`}>
@@ -23,11 +28,11 @@ function Sidebar({ onLogout }) {
       {!collapsed && (
         <div className="profile">
           <img
-              src={profilePic}
-              alt="Profile"
-              className="profile-pic"
-              style={{ width: 70, height: 70, borderRadius: "50%" }}
-            />
+            src={user?.profilePic || "/assets/profile.jpg"}
+            alt="Profile"
+            className="profile-pic"
+            style={{ width: 70, height: 70, borderRadius: "50%" }}
+          />
           <p className="name">{user?.name}</p>
         </div>
       )}
@@ -47,6 +52,14 @@ function Sidebar({ onLogout }) {
         >
           <span className="nav-icon">👤</span>
           {!collapsed && <span className="nav-text">Profile</span>}
+        </Link>
+
+        <Link 
+          to="/dashboard" 
+          className={location.pathname === "/dashboard" ? "nav-link active" : "nav-link"}
+        >
+          <span className="nav-icon">📊</span>
+          {!collapsed && <span className="nav-text">Dashboard</span>}
         </Link>
 
         <Link 
@@ -80,7 +93,7 @@ function Sidebar({ onLogout }) {
 
         <button
           className="logout-btn"
-          onClick={onLogout}
+          onClick={handleLogout}
         >
           <span className="nav-icon">⏻</span>
           {!collapsed && <span className="nav-text">Logout</span>}
