@@ -18,7 +18,7 @@ export function AuthProvider({ children }) {
     }
   }, [user]);
 
-  const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000";
+  const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5001";
 
   const signup = async (name, email, password, phone = "", profilePic = "") => {
     try {
