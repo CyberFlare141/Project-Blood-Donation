@@ -13,11 +13,19 @@ const app = express();
 
 // Enhanced CORS configuration
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // allow tools like Postman or same-origin
+    // allow your exact frontend OR any localhost in development
+    if (origin === process.env.FRONTEND_ORIGIN || /localhost(:\d+)?$/.test(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
+app.use(express.json());
 
 app.use(express.json());
 

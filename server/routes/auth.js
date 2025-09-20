@@ -12,21 +12,24 @@ const sendToken = (user, res) => {
     expiresIn: process.env.JWT_EXPIRES_IN || "3d",
   });
 
-  // Set httpOnly cookie
-  res.cookie("token", token, {
+  const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    // use 'lax' in development so cookie can be used across localhost ports
     sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
     maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
-  });
+  };
+
+  console.log("auth.sendToken: setting cookie options:", cookieOptions);
+  // For debugging only: do not log token in production
+  console.log("auth.sendToken: userId=", user._id.toString());
+
+  res.cookie("token", token, cookieOptions);
 
   return res.json({
     message: "Auth successful",
     user: { _id: user._id, name: user.name, email: user.email, phone: user.phone, profilePic: user.profilePic },
   });
 };
-
 // ===== Signup =====
 router.post("/signup", async (req, res) => {
   try {
