@@ -16,12 +16,8 @@ export default function Dashboard() {
     const fetchRequests = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_BASE}/api/requests`); // Use API_BASE here
-        
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        
+        const res = await fetch(`${API_BASE}/api/requests`);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
         setRequests(data);
         setError(null);
@@ -35,7 +31,6 @@ export default function Dashboard() {
     fetchRequests();
   }, [API_BASE]);
 
-  // derived sorted list
   const sortedRequests = useMemo(() => {
     if (!requests) return [];
     const arr = [...requests];
@@ -43,17 +38,15 @@ export default function Dashboard() {
 
     if (sortBy === "date") {
       arr.sort((a, b) => {
-        // compare yyyy-mm-dd strings safely
         const da = new Date(a.date).getTime() || 0;
         const db = new Date(b.date).getTime() || 0;
         return (da - db) * order;
       });
     } else if (sortBy === "emergency") {
-      // emergency first when desc, last when asc
       arr.sort((a, b) => {
         const ea = a.emergency ? 1 : 0;
         const eb = b.emergency ? 1 : 0;
-        return (eb - ea) * order; // eb-ea so true (1) sorts before false when order = 1/-1 accordingly
+        return (eb - ea) * order;
       });
     } else if (sortBy === "location") {
       arr.sort((a, b) => {
@@ -68,97 +61,79 @@ export default function Dashboard() {
     return arr;
   }, [requests, sortBy, sortOrder]);
 
-  if (loading) {
-    return (
-      <div className="dashboard-page">
-        <div className="loading">Loading requests...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="dashboard-page">
-        <div className="error-message">{error}</div>
-        <div className="debug-info">
-          Trying to connect to: {API_BASE}/api/requests
-        </div>
-      </div>
-    );
-  }
+  const formatDate = (d) =>
+    d ? new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) : "-";
 
   return (
-    <div className="dashboard-page">
-      <h2 className="dashboard-title">
-        <span role="img" aria-label="dashboard" className="dashboard-icon">
-          📊
-        </span>
-        Dashboard
-      </h2>
+    <div className="dashboard-page container">
+      <header className="dashboard-header">
+        <h2 className="dashboard-title">
+          <span className="dashboard-icon" role="img" aria-label="dashboard">📊</span>
+          Dashboard
+        </h2>
+        <div className="dashboard-sub">Track and sort blood requests</div>
+      </header>
 
-      <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
-        <label>
-          Sort by:&nbsp;
-          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+      <div className="controls">
+        <div className="control-group">
+          <label className="control-label">Sort by</label>
+          <select className="control-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
             <option value="date">Date</option>
             <option value="emergency">Emergency</option>
             <option value="location">Location (city)</option>
           </select>
-        </label>
+        </div>
 
-        <label>
-          Order:&nbsp;
-          <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
+        <div className="control-group">
+          <label className="control-label">Order</label>
+          <select className="control-select" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
             <option value="desc">Descending</option>
             <option value="asc">Ascending</option>
           </select>
-        </label>
-
-        <div style={{ marginLeft: "auto", fontSize: 14, color: "#555" }}>
-          Showing {sortedRequests.length} request(s)
         </div>
+
+        <div className="control-stats">Showing <strong>{sortedRequests.length}</strong> requests</div>
       </div>
-      
-      {sortedRequests.length === 0 ? (
-        <div className="no-requests">
-          <p>No blood requests found.</p>
+
+      {loading ? (
+        <div className="loading">Loading requests...</div>
+      ) : error ? (
+        <div className="error-block">
+          <div>{error}</div>
+          <div className="debug-info">Trying to connect to: {API_BASE}/api/requests</div>
         </div>
       ) : (
-        <div className="table-container">
+        <div className="table-wrap">
           <table className="dashboard-table">
             <thead>
               <tr>
-                <th>Patient Name</th>
-                <th>Blood Type</th>
+                <th>Patient</th>
+                <th>Blood</th>
                 <th>Hospital</th>
                 <th>City</th>
                 <th>Date</th>
                 <th>Time</th>
-                <th>Emergency</th>
+                <th className="col-emergency">Emergency</th>
                 <th>Contact</th>
               </tr>
             </thead>
             <tbody>
               {sortedRequests.map((req, idx) => (
-                <tr key={idx}>
-                  <td>{req.patientName}</td>
+                <tr key={req._id || idx} className={req.emergency ? "row-emergency" : ""}>
+                  <td className="patient-cell">{req.patientName}</td>
                   <td>
-                    <span className={`blood-type-badge blood-type-${req.bloodType.replace('+', 'pos').replace('-', 'neg')}`}>
+                    <span className={`blood-type-badge blood-type-${(req.bloodType || "").replace("+", "pos").replace("-", "neg")}`}>
                       {req.bloodType}
                     </span>
                   </td>
-                  <td>{req.hospitalName}</td>
+                  <td className="muted">{req.hospitalName}</td>
                   <td>{req.city}</td>
-                  <td>{req.date ? new Date(req.date).toLocaleDateString() : "-"}</td>
-                  <td>{req.time}</td>
-                  <td style={{ textAlign: "center" }}>
-                    {req.emergency ? <span style={{ color: "red", fontWeight: 700 }}>YES</span> : "—"}
+                  <td>{formatDate(req.date)}</td>
+                  <td>{req.time || "-"}</td>
+                  <td className="col-emergency">
+                    {req.emergency ? <span className="emergency-pill">EMERGENCY</span> : <span className="ok-pill">Normal</span>}
                   </td>
-                  <td>
-                    <a href={`tel:${req.contactNumber}`} className="contact-link">
-                      {req.contactNumber}
-                    </a>
-                  </td>
+                  <td><a className="contact-link" href={`tel:${req.contactNumber}`}>{req.contactNumber}</a></td>
                 </tr>
               ))}
             </tbody>
