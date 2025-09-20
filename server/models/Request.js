@@ -9,6 +9,7 @@ const requestSchema = new mongoose.Schema(
     date: { type: String, required: true },
     time: { type: String, required: true },
     contactNumber: { type: String, required: true },
+    emergency: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

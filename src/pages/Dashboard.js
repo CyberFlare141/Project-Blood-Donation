@@ -1,5 +1,4 @@
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useAuth } from "../context/AuthContext"; // Import useAuth
 import "./Dashboard.css";
 
@@ -8,6 +7,10 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { API_BASE } = useAuth(); // Get API_BASE from context
+
+  // Sorting state
+  const [sortBy, setSortBy] = useState("date"); // "date" | "emergency" | "location"
+  const [sortOrder, setSortOrder] = useState("desc"); // "asc" | "desc"
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -30,7 +33,40 @@ export default function Dashboard() {
       }
     };
     fetchRequests();
-  }, [API_BASE]); // Add API_BASE as dependency
+  }, [API_BASE]);
+
+  // derived sorted list
+  const sortedRequests = useMemo(() => {
+    if (!requests) return [];
+    const arr = [...requests];
+    const order = sortOrder === "asc" ? 1 : -1;
+
+    if (sortBy === "date") {
+      arr.sort((a, b) => {
+        // compare yyyy-mm-dd strings safely
+        const da = new Date(a.date).getTime() || 0;
+        const db = new Date(b.date).getTime() || 0;
+        return (da - db) * order;
+      });
+    } else if (sortBy === "emergency") {
+      // emergency first when desc, last when asc
+      arr.sort((a, b) => {
+        const ea = a.emergency ? 1 : 0;
+        const eb = b.emergency ? 1 : 0;
+        return (eb - ea) * order; // eb-ea so true (1) sorts before false when order = 1/-1 accordingly
+      });
+    } else if (sortBy === "location") {
+      arr.sort((a, b) => {
+        const ca = (a.city || "").toLowerCase();
+        const cb = (b.city || "").toLowerCase();
+        if (ca < cb) return -1 * order;
+        if (ca > cb) return 1 * order;
+        return 0;
+      });
+    }
+
+    return arr;
+  }, [requests, sortBy, sortOrder]);
 
   if (loading) {
     return (
@@ -59,8 +95,31 @@ export default function Dashboard() {
         </span>
         Dashboard
       </h2>
+
+      <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
+        <label>
+          Sort by:&nbsp;
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+            <option value="date">Date</option>
+            <option value="emergency">Emergency</option>
+            <option value="location">Location (city)</option>
+          </select>
+        </label>
+
+        <label>
+          Order:&nbsp;
+          <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
+            <option value="desc">Descending</option>
+            <option value="asc">Ascending</option>
+          </select>
+        </label>
+
+        <div style={{ marginLeft: "auto", fontSize: 14, color: "#555" }}>
+          Showing {sortedRequests.length} request(s)
+        </div>
+      </div>
       
-      {requests.length === 0 ? (
+      {sortedRequests.length === 0 ? (
         <div className="no-requests">
           <p>No blood requests found.</p>
         </div>
@@ -75,11 +134,12 @@ export default function Dashboard() {
                 <th>City</th>
                 <th>Date</th>
                 <th>Time</th>
+                <th>Emergency</th>
                 <th>Contact</th>
               </tr>
             </thead>
             <tbody>
-              {requests.map((req, idx) => (
+              {sortedRequests.map((req, idx) => (
                 <tr key={idx}>
                   <td>{req.patientName}</td>
                   <td>
@@ -89,8 +149,11 @@ export default function Dashboard() {
                   </td>
                   <td>{req.hospitalName}</td>
                   <td>{req.city}</td>
-                  <td>{new Date(req.date).toLocaleDateString()}</td>
+                  <td>{req.date ? new Date(req.date).toLocaleDateString() : "-"}</td>
                   <td>{req.time}</td>
+                  <td style={{ textAlign: "center" }}>
+                    {req.emergency ? <span style={{ color: "red", fontWeight: 700 }}>YES</span> : "—"}
+                  </td>
                   <td>
                     <a href={`tel:${req.contactNumber}`} className="contact-link">
                       {req.contactNumber}
