@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { useAuth } from "../context/AuthContext"; // Import useAuth
 import "./BloodRequestForm.css";
 
 function BloodRequestForm() {
@@ -12,6 +12,9 @@ function BloodRequestForm() {
     time: "",
     contactNumber: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
+  const { API_BASE } = useAuth(); // Get API_BASE from context
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,26 +22,61 @@ function BloodRequestForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+    
     try {
-      await axios.post("http://localhost:5000/api/requests", formData);
-      alert("Blood request submitted successfully!");
-      setFormData({
-        patientName: "",
-        hospitalName: "",
-        city: "",
-        bloodType: "",
-        date: "",
-        time: "",
-        contactNumber: "",
+      const response = await fetch(`${API_BASE}/api/requests`, { // Use API_BASE here
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
       });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSubmitStatus({ type: "success", message: "Blood request submitted successfully!" });
+        setFormData({
+          patientName: "",
+          hospitalName: "",
+          city: "",
+          bloodType: "",
+          date: "",
+          time: "",
+          contactNumber: "",
+        });
+      } else {
+        const errorData = await response.json();
+        setSubmitStatus({ 
+          type: "error", 
+          message: errorData.message || "Failed to submit request. Please try again." 
+        });
+      }
     } catch (err) {
-      alert("Failed to submit request");
+      console.error("Submission error:", err);
+      setSubmitStatus({ 
+        type: "error", 
+        message: "Network error. Please check if the server is running." 
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="form-container">
       <h2>Request Blood</h2>
+      
+      {submitStatus && (
+        <div className={`status-message ${submitStatus.type}`}>
+          {submitStatus.message}
+          <div className="debug-info">
+            API: {API_BASE}/api/requests
+          </div>
+        </div>
+      )}
+      
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -47,6 +85,7 @@ function BloodRequestForm() {
           value={formData.patientName}
           onChange={handleChange}
           required
+          disabled={isSubmitting}
         />
         <input
           type="text"
@@ -55,6 +94,7 @@ function BloodRequestForm() {
           value={formData.hospitalName}
           onChange={handleChange}
           required
+          disabled={isSubmitting}
         />
         <input
           type="text"
@@ -63,12 +103,14 @@ function BloodRequestForm() {
           value={formData.city}
           onChange={handleChange}
           required
+          disabled={isSubmitting}
         />
         <select
           name="bloodType"
           value={formData.bloodType}
           onChange={handleChange}
           required
+          disabled={isSubmitting}
         >
           <option value="">Select Blood Type</option>
           <option value="A+">A+</option>
@@ -86,6 +128,7 @@ function BloodRequestForm() {
           value={formData.date}
           onChange={handleChange}
           required
+          disabled={isSubmitting}
         />
         <input
           type="time"
@@ -93,6 +136,7 @@ function BloodRequestForm() {
           value={formData.time}
           onChange={handleChange}
           required
+          disabled={isSubmitting}
         />
         <input
           type="text"
@@ -101,8 +145,11 @@ function BloodRequestForm() {
           value={formData.contactNumber}
           onChange={handleChange}
           required
+          disabled={isSubmitting}
         />
-        <button type="submit">Submit Request</button>
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Submitting..." : "Submit Request"}
+        </button>
       </form>
     </div>
   );

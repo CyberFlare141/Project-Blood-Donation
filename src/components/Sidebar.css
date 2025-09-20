@@ -1,32 +1,37 @@
+/* Sidebar container */
 .sidebar {
-  background: #f0f8ff;
-  width: 180px;
+  background: #ffe6e6; /* soft pink background */
+  width: 200px; /* slightly wider to fit long names */
   min-height: 100vh;
-  padding: 10px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
   transition: width 0.3s;
-  border-right: 1px solid #ddd;
+  border-right: none; /* removed white/gray border */
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05); /* subtle shadow instead */
 }
 
 .sidebar.collapsed {
   width: 60px;
 }
 
+/* Toggle button */
 .toggle-btn {
-  background: #e0f7fa;
+  background: #ffb3b3; /* light red */
   border: none;
   padding: 8px;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   font-size: 14px;
+  color: #8b0000;
 }
 
 .toggle-btn:hover {
-  background: #b2ebf2;
+  background: #ff9999;
 }
 
+/* Profile section */
 .profile {
   text-align: center;
   margin-bottom: 20px;
@@ -36,45 +41,50 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  border: 2px solid #ddd;
+  border: 2px solid #ff9999; /* red border */
 }
 
 .name {
   margin: 10px 0 0 0;
   font-size: 14px;
   font-weight: bold;
-  color: #333;
+  color: #a50000;
 }
 
+/* Nav links container */
 .nav-links {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
   flex-grow: 1;
 }
 
+/* Each nav link */
 .nav-link {
   display: flex;
   align-items: center;
   padding: 12px 10px;
-  border-radius: 5px;
+  border-radius: 6px;
   text-decoration: none;
-  color: #333;
+  color: #a50000; /* dark red text */
   transition: all 0.2s;
   gap: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; /* keep on one line */
 }
 
 .nav-link:hover {
-  background: #e1f5fe;
-  text-decoration: none;
-  color: #333;
+  background: #ffc2c2;
+  color: #a50000;
 }
 
 .nav-link.active {
-  background: #00bcd4;
+  background: #ff4d4d; /* deep red */
   color: white;
 }
 
+/* Icon and text */
 .nav-icon {
   font-size: 16px;
   min-width: 20px;
@@ -83,16 +93,20 @@
 
 .nav-text {
   font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+  flex: 1;
 }
 
+/* Logout button */
 .logout-btn {
   display: flex;
   align-items: center;
   padding: 12px 10px;
-  border-radius: 5px;
+  border-radius: 6px;
   border: none;
-  background: #ff5722;
+  background: #ff4d4d; /* strong red */
   color: white;
   cursor: pointer;
   transition: all 0.2s;
@@ -102,5 +116,5 @@
 }
 
 .logout-btn:hover {
-  background: #e64a19;
+  background: #e60000;
 }
