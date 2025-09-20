@@ -21,6 +21,23 @@ export function AuthProvider({ children }) {
   const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000";
   console.log("🔗 API_BASE is set to:", API_BASE);
 
+  // Restore session on mount by calling /api/auth/me (sends cookie)
+  useEffect(() => {
+    const restore = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/me`, {
+          credentials: "include",
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data?.user) setUser(data.user);
+      } catch (e) {
+        console.error("Failed to restore session:", e);
+      }
+    };
+    restore();
+  }, [API_BASE]);
+
   const signup = async (name, email, password, phone = "", profilePic = "") => {
     try {
       const url = `${API_BASE}/api/auth/signup`;
@@ -29,6 +46,7 @@ export function AuthProvider({ children }) {
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // important: allow cookie to be set
         body: JSON.stringify({ name, email, password, phone, profilePic }),
       });
 
@@ -58,6 +76,7 @@ export function AuthProvider({ children }) {
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // important: allow cookie to be set
         body: JSON.stringify({ email, password }),
       });
       
@@ -79,10 +98,19 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const logout = () => {
-    console.log("👋 Logging out user");
-    setUser(null);
-    localStorage.removeItem("user");
+  const logout = async () => {
+    try {
+      console.log("👋 Logging out user");
+      await fetch(`${API_BASE}/api/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (e) {
+      console.error("Logout request failed:", e);
+    } finally {
+      setUser(null);
+      localStorage.removeItem("user");
+    }
   };
 
   // Add a test function to check API connection

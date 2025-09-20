@@ -1,4 +1,3 @@
-// server/routes/auth.js
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -17,7 +16,8 @@ const sendToken = (user, res) => {
   res.cookie("token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    // use 'lax' in development so cookie can be used across localhost ports
+    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
     maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
   });
 
@@ -85,7 +85,7 @@ router.post("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
   });
   res.json({ message: "Logged out successfully" });
 });
