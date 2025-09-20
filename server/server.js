@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
+import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/auth.js";
 import requestRoutes from "./routes/request.js";
@@ -19,6 +20,9 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+// register cookie parser so req.cookies is available
+app.use(cookieParser());
 
 // Request logging middleware
 app.use((req, res, next) => {
