@@ -80,7 +80,6 @@ function BloodRequestForm() {
         )}
 
         <form className="brf-form" onSubmit={handleSubmit}>
-
           <input
             className="full"
             type="text"
@@ -168,7 +167,7 @@ function BloodRequestForm() {
           <div className="emergency-row full">
             <span className="emergency-left">
               <strong>Emergency</strong>
-              <span className="emergency-help">Mark if immediate attention required</span>
+              <span className="emergency-help">  (Mark if immediate attention required)</span>
             </span>
 
             <label className={`switch ${isSubmitting ? "disabled" : ""}`}>
@@ -188,6 +187,13 @@ function BloodRequestForm() {
             {isSubmitting ? "Submitting..." : "Submit Request"}
           </button>
         </form>
+        <aside className="brf-side">
+          <div className="side-badge">⚕️</div>
+          <div className="side-title">Quick Tips</div>
+          <div className="side-text">
+            Use the Emergency toggle for life‑threatening needs. Provide accurate contact info so donors can reach you fast.
+          </div>
+        </aside>
       </div>
     </section>
   );
