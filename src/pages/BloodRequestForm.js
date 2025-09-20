@@ -11,13 +11,15 @@ function BloodRequestForm() {
     date: "",
     time: "",
     contactNumber: "",
+    emergency: false, // new
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
   const { API_BASE } = useAuth(); // Get API_BASE from context
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
   };
 
   const handleSubmit = async (e) => {
@@ -45,9 +47,10 @@ function BloodRequestForm() {
           date: "",
           time: "",
           contactNumber: "",
+          emergency: false,
         });
       } else {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({ message: "Unknown error" }));
         setSubmitStatus({ 
           type: "error", 
           message: errorData.message || "Failed to submit request. Please try again." 
@@ -122,6 +125,18 @@ function BloodRequestForm() {
           <option value="AB+">AB+</option>
           <option value="AB-">AB-</option>
         </select>
+
+        <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <input
+            type="checkbox"
+            name="emergency"
+            checked={formData.emergency}
+            onChange={handleChange}
+            disabled={isSubmitting}
+          />
+          Emergency
+        </label>
+
         <input
           type="date"
           name="date"

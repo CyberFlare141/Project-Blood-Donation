@@ -10,27 +10,22 @@ export function AuthProvider({ children }) {
   });
 
   useEffect(() => {
-    if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
-    } else {
-      localStorage.removeItem("user");
-    }
+    if (user) localStorage.setItem("user", JSON.stringify(user));
+    else localStorage.removeItem("user");
   }, [user]);
 
-  // DEBUG: Log the API base URL
-  const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000";
-  console.log("🔗 API_BASE is set to:", API_BASE);
-
-  // Restore session on mount by calling /api/auth/me (sends cookie)
   useEffect(() => {
     const restore = async () => {
       try {
         const res = await fetch(`${API_BASE}/api/auth/me`, {
           credentials: "include",
         });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data?.user) setUser(data.user);
+        console.log("🔄 /api/auth/me status:", res.status);
+        // parse JSON safely (some errors return empty body)
+        const data = await res.json().catch(() => null);
+        console.log("🔄 /api/auth/me data:", data);
+        const restoredUser = data?.user ?? data;
+        if (restoredUser) setUser(restoredUser);
       } catch (e) {
         console.error("Failed to restore session:", e);
       }
@@ -42,24 +37,26 @@ export function AuthProvider({ children }) {
     try {
       const url = `${API_BASE}/api/auth/signup`;
       console.log("🔗 Signup - Attempting to connect to:", url);
-      
+
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // important: allow cookie to be set
+        credentials: "include",
         body: JSON.stringify({ name, email, password, phone, profilePic }),
       });
 
       console.log("📨 Signup - Response status:", res.status);
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
       console.log("📨 Signup - Response data:", data);
 
       if (!res.ok) {
+        console.error("Signup failed:", data);
         alert(data?.message || "Signup failed");
         return false;
       }
 
-      setUser(data.user);
+      const newUser = data?.user ?? data;
+      setUser(newUser);
       return true;
     } catch (e) {
       console.error("❌ Signup failed:", e);
@@ -72,24 +69,26 @@ export function AuthProvider({ children }) {
     try {
       const url = `${API_BASE}/api/auth/login`;
       console.log("🔗 Login - Attempting to connect to:", url);
-      
+
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // important: allow cookie to be set
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
-      
+
       console.log("📨 Login - Response status:", res.status);
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
       console.log("📨 Login - Response data:", data);
 
       if (!res.ok) {
+        console.error("Login failed:", data);
         alert(data?.message || "Login failed");
         return false;
       }
 
-      setUser(data.user);
+      const loggedUser = data?.user ?? data;
+      setUser(loggedUser);
       return true;
     } catch (e) {
       console.error("❌ Login failed:", e);
