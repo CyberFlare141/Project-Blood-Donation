@@ -13,7 +13,7 @@ function Profile() {
   useEffect(() => {
     if (user?._id) {
       setLoading(true);
-      fetch(`${API_BASE}/api/auth/profile/${user._id}`) // Use API_BASE here
+      fetch(`${API_BASE}/api/auth/profile/${user._id}`, { credentials: "include" }) // send cookie
         .then(res => {
           if (!res.ok) {
             throw new Error(`HTTP error! status: ${res.status}`);
@@ -22,10 +22,10 @@ function Profile() {
         })
         .then(data => {
           setProfile(data);
-          setForm({ 
-            name: data.name, 
-            phone: data.phone || "", 
-            profilePic: data.profilePic || "" 
+          setForm({
+            name: data.name,
+            phone: data.phone || "",
+            profilePic: data.profilePic || ""
           });
           setError(null);
         })
@@ -36,6 +36,9 @@ function Profile() {
         .finally(() => {
           setLoading(false);
         });
+    } else {
+      // if no user, stop loading
+      setLoading(false);
     }
   }, [user, API_BASE]);
 
@@ -46,16 +49,18 @@ function Profile() {
   const handleSave = async e => {
     e.preventDefault();
     try {
-      const res = await fetch(`${API_BASE}/api/auth/profile/${user._id}`, { // Use API_BASE here
+      const res = await fetch(`${API_BASE}/api/auth/profile/${user._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // include cookie
         body: JSON.stringify(form),
       });
-      
+
       if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+        const msg = await res.json().catch(() => ({ message: `HTTP ${res.status}` }));
+        throw new Error(msg?.message || `HTTP error ${res.status}`);
       }
-      
+
       const data = await res.json();
       setProfile(data);
       setUser(data);

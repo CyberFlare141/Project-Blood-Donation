@@ -93,4 +93,42 @@ router.post("/logout", (req, res) => {
   res.json({ message: "Logged out successfully" });
 });
 
+// --- NEW: profile routes ---
+router.get("/profile/:id", authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    return res.json(user);
+  } catch (err) {
+    console.error("GET /profile/:id error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.put("/profile/:id", authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    // only allow owner to update their profile
+    if (req.user._id.toString() !== id) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const { name, phone, profilePic } = req.body;
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (name !== undefined) user.name = name;
+    if (phone !== undefined) user.phone = phone;
+    if (profilePic !== undefined) user.profilePic = profilePic;
+
+    await user.save();
+    const safeUser = await User.findById(id).select("-password");
+    return res.json(safeUser);
+  } catch (err) {
+    console.error("PUT /profile/:id error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
 export default router;
