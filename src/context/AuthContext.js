@@ -4,12 +4,10 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    // Try to load user from localStorage on first render
     const stored = localStorage.getItem("user");
     return stored ? JSON.parse(stored) : null;
   });
 
-  // Save user to localStorage whenever it changes
   useEffect(() => {
     if (user) {
       localStorage.setItem("user", JSON.stringify(user));
@@ -18,7 +16,7 @@ export function AuthProvider({ children }) {
     }
   }, [user]);
 
-  const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5001";
+  const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000";
 
   const signup = async (name, email, password, phone = "", profilePic = "") => {
     try {
@@ -45,10 +43,29 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const login = (userData) => {
-    setUser(userData); // userData should have _id
-    localStorage.setItem("user", JSON.stringify(userData));
+  const login = async (email, password) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data?.message || "Login failed");
+        return false;
+      }
+
+      setUser(data.user);
+      return true;
+    } catch (e) {
+      console.error("Login failed:", e);
+      alert("Login failed (network/server error)");
+      return false;
+    }
   };
+
 
   const logout = () => {
     setUser(null);
@@ -65,7 +82,3 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
-
-
-
-
