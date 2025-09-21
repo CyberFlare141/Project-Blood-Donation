@@ -1,67 +1,67 @@
-
 .contact-container {
   font-family: Arial, sans-serif;
-  background: #f8f9fa;
+  background: #ffb3b3; /* main page background */
   min-height: 100vh;
-  text-align: center;
   padding: 0;
   margin: 0;
 }
 
+/* header strip */
 .contact-header {
-  background: #d32f2f;
+  background: #e63946;
   color: white;
   padding: 40px 20px;
+  text-align: center;
 }
-
 .contact-header h1 {
   margin: 0;
   font-size: 32px;
 }
-
 .contact-header p {
   margin-top: 10px;
   font-size: 16px;
 }
 
-/* Card */
+/* GET IN TOUCH section (different color) */
+.get-in-touch {
+  background: #fff8f8; /* off-white section background */
+  padding: 40px 20px;
+}
+
+/* Card inside the section */
 .contact-card {
-  background: white;
+  background: #ffe3e3;
   max-width: 800px;
-  margin: 30px auto;
+  margin: 0 auto;
   padding: 30px;
   border-radius: 12px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Info section */
+/* Info section inside card */
 .contact-info h2 {
-  color: #d32f2f;
+  color: #e63946;
   margin-bottom: 15px;
 }
-
 .contact-info p {
   margin: 5px 0;
   font-size: 15px;
 }
-
 .contact-info a {
-  color: #d32f2f;
+  color: #e63946;
   text-decoration: none;
 }
-
 .contact-info a:hover {
   text-decoration: underline;
 }
 
-/* Form */
+/* Form styles */
 .contact-form {
   margin-top: 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
-
 .contact-form input,
 .contact-form textarea {
   width: 100%;
@@ -70,9 +70,8 @@
   border-radius: 6px;
   font-size: 14px;
 }
-
 .contact-form button {
-  background: #d32f2f;
+  background: #e63946;
   color: white;
   border: none;
   padding: 12px;
@@ -81,28 +80,53 @@
   font-size: 16px;
   font-weight: bold;
 }
-
 .contact-form button:hover {
-  background: #b71c1c;
+  background: #d62839;
 }
 
-/* Map */
+/* MAP section */
+.map-section {
+  background: #ffd6d6; /* light red background for map area */
+  padding: 40px 20px;
+}
 .contact-map {
-  background: #e0e0e0;
+  max-width: 800px;
+  margin: 0 auto;
   height: 200px;
-  margin-top: 20px;
   border-radius: 8px;
+  background: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   color: #555;
   font-size: 14px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
+.contact-map-link {
+  text-decoration: none; /* remove underline */
+  color: inherit;        /* keep text color same */
+  display: block;        /* make whole box clickable */
+}
+
+.contact-map:hover {
+  background: #f8f8f8; /* slight hover feedback */
+  cursor: pointer;
+}
+
 
 /* Footer */
 .contact-footer {
+  text-align: center;
   margin-top: 40px;
   font-size: 13px;
   color: #555;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .contact-card,
+  .contact-map {
+    padding: 20px;
+  }
 }

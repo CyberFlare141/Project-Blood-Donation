@@ -1,170 +1,490 @@
+/* ======== Global Reset ======== */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  background-color: #e63946; /* match your main color */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+/* ======== Sidebar Fix ======== */
+.sidebar {
+  width: 240px; /* adjust as needed */
+}
+
+.sidebar a {
+  display: block;
+  padding: 12px 16px;
+  white-space: normal;       /* allow wrapping */
+  word-break: break-word;    /* break long words */
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ======== Home page container ======== */
 .home-page {
-  font-family: Arial, sans-serif;
+  background: #e63946;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* this is for top part "Hero title*/
-.hero-section {
-  background: linear-gradient(135deg, #dc3545, #c82333);
-  color: white;
-  text-align: center;
-  padding: 80px 20px;
-}
-
-.hero-section h1 {
-  font-size: 2.5rem;
-  margin-bottom: 20px;
-  font-weight: bold;
-}
-
-.hero-section p {
-  font-size: 1.2rem;
-  margin-bottom: 30px;
-}
-
-.donate-button {
-  background-color: white;
-  color: #dc3545;
-  border: none;
-  padding: 15px 30px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.donate-button:hover {
-  background-color: #f8f9fa;
-  transform: translateY(-2px);
-}
-
-/*top part ends and start Container */
+/* Container fix */
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 50px 20px;
+  padding: 0 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.section-title {
-  margin-bottom: 30px;
-  color: #333;
+/* ======== Main Sections ======== */
+.hero-section,
+.quick-actions-section,
+.inventory-section,
+.eligibility-section,
+.stats-section {
+  width: 100%;
+  margin: 0;
+  padding: 3rem 0;
+  box-sizing: border-box;
+  position: static; /* removed forced centering */
 }
 
-/* Blood Cards , under part */
-.blood-cards {
+/* ======== Hero Section ======== */
+.hero-section {
+  background-color: #ffb3b3;
   display: flex;
-  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4rem 0;
+}
+
+.hero-content {
+  flex: 1;
+  max-width: 600px;
+  padding: 0 2rem;
+}
+
+.hero-visual {
+  flex: 1;
+  text-align: center;
+  padding: 0 2rem;
+}
+
+.blood-drop-icon {
+  font-size: 8rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Hero buttons */
+.hero-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
   flex-wrap: wrap;
 }
 
-.blood-card {
-  flex: 1;
-  min-width: 200px;
-  padding: 30px 20px;
-  text-align: center;
-  border-radius: 8px;
-  border: 2px solid;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.blood-card h5 {
-  font-size: 1.5rem;
-  margin-bottom: 10px;
-}
-
-.blood-card p {
-  margin-bottom: 10px;
-}
-
-.blood-card strong {
-  font-size: 1.2rem;
-}
-
-
-.urgent {
-  border-color: #dc3545;
-  background-color: #fff5f5;
-}
-
-.low {
-  border-color: #ffc107;
-  background-color: #fffbf0;
-}
-
-.good {
-  border-color: #28a745;
-  background-color: #f8fff8;
-}
-
-.normal {
-  border-color: #007bff;
-  background-color: #f0f8ff;
-}
-
-
-.eligibility-section {
-  background-color: #f8f9fa;
-  padding: 40px;
-  border-radius: 8px;
-  border: 1px solid #dee2e6;
-}
-
-.eligibility-section p {
-  font-size: 1.1rem;
-  margin-bottom: 20px;
-}
-
-
-.button {
-  border: none;
-  padding: 12px 25px;
-  font-size: 1rem;
-  border-radius: 5px;
-  cursor: pointer;
-  margin: 10px;
+.cta-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
   transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+  text-align: center;
+  flex-shrink: 0;
 }
 
-.yes-button {
-  background-color: #28a745;
+.cta-button.primary {
+  background-color: #e63946;
   color: white;
 }
 
-.yes-button:hover {
-  background-color: #218838;
+.cta-button.primary:hover {
+  background-color: #d62839;
+  transform: translateY(-2px);
 }
 
-.no-button {
-  background-color: #dc3545;
+.cta-button.secondary {
+  background-color: transparent;
+  color: #e63946;
+  border: 2px solid #e63946;
+}
+
+.cta-button.secondary:hover {
+  background-color: #e63946;
   color: white;
 }
 
-.no-button:hover {
-  background-color: #c82333;
+/* ======== Quick Actions Section ======== */
+.quick-actions-section {
+  background-color: #ffb3b3;
 }
 
-.check-button {
-  background-color: #007bff;
+.action-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.action-card {
+  background: #ffe3e3;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.action-card:hover {
+  transform: translateY(-5px);
+}
+
+.action-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.action-link {
+  display: inline-block;
+  margin-top: 1rem;
+  color: #e63946;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.action-link:hover {
+  text-decoration: underline;
+}
+
+/* ======== Blood Inventory Section ======== */
+.inventory-section {
+  background-color: #ffd6d6;
+}
+
+.blood-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.blood-type {
+  background: #ffe3e3;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  position: relative;
+}
+
+.blood-type.urgent {
+  border-left: 4px solid #e63946;
+}
+
+.blood-type.low {
+  border-left: 4px solid #fca311;
+}
+
+.blood-type.moderate {
+  border-left: 4px solid #2a9d8f;
+}
+
+.blood-level {
+  margin-top: 1rem;
+}
+
+.level-bar {
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.level-fill {
+  height: 100%;
+  transition: width 0.5s ease;
+}
+
+.blood-type.urgent .level-fill {
+  background: #e63946;
+}
+
+.blood-type.low .level-fill {
+  background: #fca311;
+}
+
+.blood-type.moderate .level-fill {
+  background: #2a9d8f;
+}
+
+.level-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: block;
+}
+
+/* Badge styles */
+.badge-pill {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.urgent-badge {
+  background: #e63946;
   color: white;
-  margin-top: 20px;
 }
 
-.check-button:hover {
-  background-color: #0056b3;
+.low-badge {
+  background: #fca311;
+  color: black;
 }
 
+.moderate-badge {
+  background: #2a9d8f;
+  color: white;
+}
 
+.light-badge {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.neutral-badge {
+  background: #6c757d;
+  color: white;
+}
+
+.info-badge {
+  background: #17a2b8;
+  color: white;
+}
+
+/* ======== Eligibility Section ======== */
+.eligibility-section {
+  background-color: #ffb3b3;
+}
+
+.eligibility-card {
+  background: #ffe3e3;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.eligibility-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+}
+
+.answer-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  border: 2px solid #e63946;
+  background: transparent;
+  color: #e63946;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.answer-btn.selected,
+.answer-btn:hover {
+  background: #e63946;
+  color: white;
+}
+
+.eligibility-feedback {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.eligibility-feedback .eligible {
+  color: #2a9d8f;
+}
+
+.eligibility-feedback .not-eligible {
+  color: #e63946;
+}
+
+.eligibility-final-result {
+  padding: 1rem;
+}
+
+.eligibility-result.success h3 {
+  color: #2a9d8f;
+}
+
+.eligibility-result.warning h3 {
+  color: #e63946;
+}
+
+/* ======== Stats Section ======== */
+.stats-section {
+  background-color: #ffd6d6;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.stat {
+  text-align: center;
+  padding: 1.5rem;
+  background: #ffe3e3;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.stat h3 {
+  font-size: 2.5rem;
+  color: #e63946;
+  margin-bottom: 0.5rem;
+}
+
+/* Section titles */
+.section-subtitle {
+  color: #6c757d;
+  margin-top: 0.5rem;
+}
+
+/* ======== Form container styles ======== */
+.form-container {
+  max-width: 450px;
+  margin: 50px auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.form-container h2 {
+  margin-bottom: 20px;
+  color: #b71c1c;
+}
+
+form input, form select, form button {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+form button {
+  background: #b71c1c;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+form button:hover {
+  background: #8a1212;
+}
+
+/* ======== Responsive adjustments ======== */
 @media (max-width: 768px) {
-  .hero-section h1 {
-    font-size: 2rem;
-  }
-  
-  .blood-cards {
+  .hero-section {
     flex-direction: column;
+    text-align: center;
+    padding: 2rem 0;
   }
   
-  .eligibility-section {
+  .hero-content, .hero-visual {
+    padding: 1rem;
+  }
+  
+  .hero-buttons {
+    justify-content: center;
+  }
+  
+  .blood-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+  
+  .action-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Form container adjustments for mobile */
+  .form-container {
+    max-width: 90%;
+    margin: 30px auto;
     padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .blood-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .cta-button {
+    width: 100%;
+    max-width: 250px;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Form container adjustments for small mobile */
+  .form-container {
+    max-width: 95%;
+    margin: 20px auto;
+    padding: 15px;
+  }
+  
+  form input, form select, form button {
+    padding: 10px;
+    font-size: 14px;
   }
 }

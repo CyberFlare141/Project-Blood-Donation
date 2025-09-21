@@ -1,63 +1,122 @@
-/* Modal overlay */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* semi-transparent black */
+
+/* Sidebar container */
+.sidebar {
+  background: #ffe6e6; /* soft pink background */
+  width: 200px; /* slightly wider to fit long names */
+  min-height: 100vh;
+  padding: 12px;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  flex-direction: column;
+  transition: width 0.3s;
+  border-right: none; /* removed white/gray border */
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05); /* subtle shadow instead */
 }
 
-/* Modal box */
-.modal {
-  background-color: #fff;
-  padding: 20px 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-  max-width: 400px;
-  width: 90%;
+.sidebar.collapsed {
+  width: 60px;
+}
+
+/* Toggle button */
+.toggle-btn {
+  background: #ffb3b3; /* light red */
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #8b0000;
+}
+
+.toggle-btn:hover {
+  background: #ff9999;
+}
+
+/* Profile section */
+.profile {
   text-align: center;
-  animation: fadeIn 0.3s ease-out;
-}
-
-/* Modal text */
-.modal p {
-  font-size: 16px;
   margin-bottom: 20px;
 }
 
-/* Modal buttons */
-.modal button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  margin: 0 5px;
+.profile-pic {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid #ff9999; /* red border */
+}
+
+.name {
+  margin: 10px 0 0 0;
+  font-size: 14px;
+  font-weight: bold;
+  color: #a50000;
+}
+
+/* Nav links container */
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-grow: 1;
+}
+
+/* Each nav link */
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 12px 10px;
   border-radius: 6px;
+  text-decoration: none;
+  color: #a50000; /* dark red text */
+  transition: all 0.2s;
+  gap: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; /* keep on one line */
+}
+
+.nav-link:hover {
+  background: #ffc2c2;
+  color: #a50000;
+}
+
+.nav-link.active {
+  background: #ff4d4d; /* deep red */
+  color: white;
+}
+
+/* Icon and text */
+.nav-icon {
+  font-size: 16px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.nav-text {
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+/* Logout button */
+.logout-btn {
+  display: flex;
+  align-items: center;
+  padding: 12px 10px;
+  border-radius: 6px;
+  border: none;
+  background: #ff4d4d; /* strong red */
+  color: white;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  margin-top: auto;
+  gap: 10px;
+  font-size: 14px;
 }
 
-.modal button:hover {
-  background-color: #0056b3;
+.logout-btn:hover {
+  background: #e60000;
 }
 
-/* Cancel button */
-.modal button:last-child {
-  background-color: #ccc;
-  color: #333;
-}
-
-.modal button:last-child:hover {
-  background-color: #999;
-}
-
-/* Fade-in animation */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}

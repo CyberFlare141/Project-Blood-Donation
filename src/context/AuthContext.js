@@ -3,13 +3,53 @@ import axios from "axios";
 
 const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000";
+// API base URL (from env or fallback)
+export const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000";
 
-  const signupRequest = async (name, email, password, phone, profilePic) => {
+console.log("🔧 API_BASE in AuthContext:", API_BASE);
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(() => {
+    const stored = localStorage.getItem("user");
+    return stored ? JSON.parse(stored) : null;
+  });
+
+  // Persist user in localStorage
+  useEffect(() => {
+    if (user) localStorage.setItem("user", JSON.stringify(user));
+    else localStorage.removeItem("user");
+  }, [user]);
+
+  // Restore session on refresh
+  useEffect(() => {
+    const restore = async () => {
+      try {
+        console.log("🔄 Checking session:", `${API_BASE}/api/auth/me`);
+        const res = await fetch(`${API_BASE}/api/auth/me`, {
+          credentials: "include",
+        });
+        console.log("🔄 /api/auth/me status:", res.status);
+
+        if (!res.ok) return;
+
+        const data = await res.json().catch(() => null);
+        console.log("🔄 /api/auth/me data:", data);
+
+        const restoredUser = data?.user ?? data;
+        if (restoredUser) setUser(restoredUser);
+      } catch (e) {
+        console.error("Failed to restore session:", e);
+      }
+    };
+    restore();
+  }, []);
+
+  // === Signup step 1 (request OTP) ===
+  const signupRequest = async (name, email, password, phone = "", profilePic = "") => {
     try {
-      const res = await axios.post(`${API_BASE}/api/auth/signup-request`, { name, email, password, phone, profilePic });
+      const res = await axios.post(`${API_BASE}/api/auth/signup-request`, {
+        name, email, password, phone, profilePic
+      });
       return res.data.success;
     } catch (err) {
       alert(err.response?.data?.message || "Signup request failed");
@@ -17,9 +57,14 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // === Signup step 2 (verify OTP) ===
   const signupVerify = async (email, otp) => {
     try {
-      const res = await axios.post(`${API_BASE}/api/auth/signup-verify`, { email, otp }, { withCredentials: true });
+      const res = await axios.post(
+        `${API_BASE}/api/auth/signup-verify`,
+        { email, otp },
+        { withCredentials: true }
+      );
       if (res.data.user) setUser(res.data.user);
       return res.data.user;
     } catch (err) {
@@ -28,6 +73,7 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // === Login step 1 (request OTP) ===
   const loginRequest = async (email, password) => {
     try {
       const res = await axios.post(`${API_BASE}/api/auth/login-request`, { email, password });
@@ -38,9 +84,14 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // === Login step 2 (verify OTP) ===
   const loginVerify = async (email, otp) => {
     try {
-      const res = await axios.post(`${API_BASE}/api/auth/login-verify`, { email, otp }, { withCredentials: true });
+      const res = await axios.post(
+        `${API_BASE}/api/auth/login-verify`,
+        { email, otp },
+        { withCredentials: true }
+      );
       if (res.data.user) setUser(res.data.user);
       return res.data.user;
     } catch (err) {
@@ -49,20 +100,31 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // === Logout ===
   const logout = async () => {
     try {
       await axios.post(`${API_BASE}/api/auth/logout`, {}, { withCredentials: true });
+    } catch (e) {
+      console.error("Logout error:", e);
+    } finally {
       setUser(null);
-    } catch {}
+      localStorage.removeItem("user");
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, signupRequest, signupVerify, loginRequest, loginVerify, logout }}>
+    <AuthContext.Provider
+      value={{ user, setUser, signupRequest, signupVerify, loginRequest, loginVerify, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
 
 export function useAuth() {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 }
