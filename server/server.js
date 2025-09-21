@@ -8,6 +8,8 @@ import connectDB from "./config/db.js";
 import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/auth.js";
+// fix: import the actual requests router file (it's named request.js)
+import requestsRoutes from "./routes/request.js";
 
 dotenv.config();
 console.log("Email user:", process.env.EMAIL_USER ? "Loaded" : "Missing");
@@ -54,6 +56,7 @@ app.get("/api/health", (req, res) => {
 
 // Your routes
 app.use("/api/auth", authRoutes);
+app.use("/api/requests", requestsRoutes);
 
 
 // 404 handler
