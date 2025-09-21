@@ -1,8 +1,12 @@
 import React, { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./BloodRequestForm.css";
 
 function BloodRequestForm() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     patientName: "",
     hospitalName: "",
@@ -13,14 +17,15 @@ function BloodRequestForm() {
     contactNumber: "",
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/requests", formData);
+      await axios.post("http://localhost:5000/api/requests", formData, {
+        withCredentials: true,
+      });
       alert("Blood request submitted successfully!");
       setFormData({
         patientName: "",
@@ -35,6 +40,18 @@ function BloodRequestForm() {
       alert("Failed to submit request");
     }
   };
+
+  // If user is not logged in, show message inside page
+  if (!user) {
+    return (
+      <div className="form-container">
+        <div className="login-message-card">
+          <p>You have to log in to see the contents of this page.</p>
+          <button onClick={() => navigate("/login")}>Go to Login</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="form-container">

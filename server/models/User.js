@@ -6,7 +6,15 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   phone: { type: String },         
   profilePic: { type: String },    
+  otp: {
+  type: String,
+},
+otpExpires: {
+  type: Date,
+},
+
 });
+
 
 const User = mongoose.model("User", userSchema);
 export default User;

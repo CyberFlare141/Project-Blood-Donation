@@ -1,106 +1,63 @@
-.sidebar {
-  background: #f0f8ff;
-  width: 180px;
-  min-height: 100vh;
-  padding: 10px;
+/* Modal overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* semi-transparent black */
   display: flex;
-  flex-direction: column;
-  transition: width 0.3s;
-  border-right: 1px solid #ddd;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-.sidebar.collapsed {
-  width: 60px;
-}
-
-.toggle-btn {
-  background: #e0f7fa;
-  border: none;
-  padding: 8px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-bottom: 10px;
-  font-size: 14px;
-}
-
-.toggle-btn:hover {
-  background: #b2ebf2;
-}
-
-.profile {
+/* Modal box */
+.modal {
+  background-color: #fff;
+  padding: 20px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  max-width: 400px;
+  width: 90%;
   text-align: center;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Modal text */
+.modal p {
+  font-size: 16px;
   margin-bottom: 20px;
 }
 
-.profile-pic {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: 2px solid #ddd;
-}
-
-.name {
-  margin: 10px 0 0 0;
-  font-size: 14px;
-  font-weight: bold;
-  color: #333;
-}
-
-.nav-links {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  flex-grow: 1;
-}
-
-.nav-link {
-  display: flex;
-  align-items: center;
-  padding: 12px 10px;
-  border-radius: 5px;
-  text-decoration: none;
-  color: #333;
-  transition: all 0.2s;
-  gap: 10px;
-}
-
-.nav-link:hover {
-  background: #e1f5fe;
-  text-decoration: none;
-  color: #333;
-}
-
-.nav-link.active {
-  background: #00bcd4;
+/* Modal buttons */
+.modal button {
+  background-color: #007bff;
   color: white;
-}
-
-.nav-icon {
-  font-size: 16px;
-  min-width: 20px;
-  text-align: center;
-}
-
-.nav-text {
-  font-size: 14px;
-  white-space: nowrap;
-}
-
-.logout-btn {
-  display: flex;
-  align-items: center;
-  padding: 12px 10px;
-  border-radius: 5px;
   border: none;
-  background: #ff5722;
-  color: white;
+  padding: 8px 14px;
+  margin: 0 5px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s;
-  margin-top: auto;
-  gap: 10px;
-  font-size: 14px;
+  transition: background-color 0.2s;
 }
 
-.logout-btn:hover {
-  background: #e64a19;
+.modal button:hover {
+  background-color: #0056b3;
+}
+
+/* Cancel button */
+.modal button:last-child {
+  background-color: #ccc;
+  color: #333;
+}
+
+.modal button:last-child:hover {
+  background-color: #999;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

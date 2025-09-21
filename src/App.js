@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
@@ -7,46 +7,36 @@ import Profile from './pages/Profile';
 import Instruction from './pages/Instruction';
 import FAQ from './pages/FAQ';
 import ContactUs from './pages/ContactUs';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import Sidebar from './components/Sidebar';
+import { AuthProvider } from './context/AuthContext';
+import Layout from './components/Layout';
 import BloodRequestForm from './pages/BloodRequestForm';
 import Dashboard from './pages/Dashboard';
-
-function PrivateRoute({ children }) {
-  const { user } = useAuth();
-  return user ? children : <Navigate to="/login" />;
-}
+import PrivateRoute from './components/PrivateRoute';  // ✅ new
 
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+        <Layout>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/" element={<Home />} />
 
-          <Route
-            path="/*"
-            element={
-              <PrivateRoute>
-                <div style={{ display: 'flex' }}>
-                  <Sidebar />
-                  <div style={{ flex: 1, padding: '16px' }}>
-                    <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/profile" element={<Profile />} />
-                      <Route path="/dashboard" element={<Dashboard />} />
-                      <Route path="/instruction" element={<Instruction />} />
-                      <Route path="/contactus" element={<ContactUs />} />
-                      <Route path="/BloodRequestForm" element={<BloodRequestForm />} />
-                      <Route path="/faq" element={<FAQ />} />
-                    </Routes>
-                  </div>
-                </div>
-              </PrivateRoute>
-            }
-          />
-        </Routes>
+            {/* Protected routes with message */}
+            <Route path="/profile" element={
+              <PrivateRoute><Profile /></PrivateRoute>
+            } />
+            <Route path="/BloodRequestForm" element={
+              <PrivateRoute><BloodRequestForm /></PrivateRoute>
+            } />
+
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/instruction" element={<Instruction />} />
+            <Route path="/contactus" element={<ContactUs />} />
+            <Route path="/faq" element={<FAQ />} />
+          </Routes>
+        </Layout>
       </Router>
     </AuthProvider>
   );
