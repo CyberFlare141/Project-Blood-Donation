@@ -3,7 +3,14 @@ import User from "../models/User.js";
 
 export const authMiddleware = async (req, res, next) => {
   try {
-    const token = req.cookies?.token;
+    // read token from cookie first, fallback to Authorization header
+    const cookieToken = req.cookies?.token;
+    const headerToken =
+      req.headers?.authorization?.startsWith("Bearer ")
+        ? req.headers.authorization.split(" ")[1]
+        : null;
+    const token = cookieToken || headerToken;
+
     if (!token) {
       return res.status(401).json({ message: "Not authenticated" });
     }

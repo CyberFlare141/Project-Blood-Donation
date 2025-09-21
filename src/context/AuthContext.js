@@ -114,7 +114,8 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, setUser, signupRequest, signupVerify, loginRequest, loginVerify, logout }}
+      // include API_BASE so consumers like Dashboard and BloodRequestForm receive it
+      value={{ user, setUser, signupRequest, signupVerify, loginRequest, loginVerify, logout, API_BASE }}
     >
       {children}
     </AuthContext.Provider>
