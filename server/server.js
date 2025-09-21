@@ -11,25 +11,15 @@ dotenv.config();
 
 const app = express();
 
-// Enhanced CORS configuration
+// Simplified CORS configuration
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true); // allow tools like Postman or same-origin
-    // allow your exact frontend OR any localhost in development
-    if (origin === process.env.FRONTEND_ORIGIN || /localhost(:\d+)?$/.test(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error("Not allowed by CORS"));
-  },
+  origin: "http://localhost:3000", // Your React app
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
 }));
-app.use(express.json());
 
 app.use(express.json());
-
-// register cookie parser so req.cookies is available
 app.use(cookieParser());
 
 // Request logging middleware
@@ -38,11 +28,21 @@ app.use((req, res, next) => {
   next();
 });
 
+// Debug middleware to see CORS requests
+app.use((req, res, next) => {
+  console.log('Request received:', {
+    method: req.method,
+    path: req.path,
+    origin: req.headers.origin,
+  });
+  next();
+});
+
 // Health endpoint
 app.get("/api/health", (req, res) => {
   res.json({ 
     message: "Server is running!",
-    port: process.env.PORT || 5000,
+    port: process.env.PORT || 5001,
     timestamp: new Date().toISOString()
   });
 });
@@ -51,22 +51,7 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/requests", requestRoutes);
 
-// Handle preflight requests for all routes - FIXED: Remove the problematic *
-app.options("/api/auth", (req, res) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.sendStatus(200);
-});
-
-app.options("/api/requests", (req, res) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.sendStatus(200);
-});
-
-// 404 handler - FIXED: Use a function instead of path pattern
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
@@ -78,10 +63,11 @@ app.use((error, req, res, next) => {
 });
 
 // Use port from environment or default to 5001
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
   console.log(`✅ Health check: http://localhost:${PORT}/api/health`);
+  console.log(`✅ CORS enabled for: http://localhost:3000`);
   connectDB();
 });

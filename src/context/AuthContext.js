@@ -1,13 +1,25 @@
-// src/context/AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
+
+// Export the API_BASE for external use if needed
+export const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5001";
+
+// DEBUG: Check what environment variables are available
+console.log("🔍 Environment variables:", {
+  REACT_APP_API_BASE: process.env.REACT_APP_API_BASE,
+  NODE_ENV: process.env.NODE_ENV,
+  API_BASE_FINAL: API_BASE
+});
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem("user");
     return stored ? JSON.parse(stored) : null;
   });
+
+  // Debug: Log the API_BASE being used
+  console.log("🔧 API_BASE in AuthProvider:", API_BASE);
 
   useEffect(() => {
     if (user) localStorage.setItem("user", JSON.stringify(user));
@@ -17,6 +29,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const restore = async () => {
       try {
+        console.log("🔄 Attempting to restore session from:", `${API_BASE}/api/auth/me`);
         const res = await fetch(`${API_BASE}/api/auth/me`, {
           credentials: "include",
         });
@@ -31,7 +44,9 @@ export function AuthProvider({ children }) {
       }
     };
     restore();
-  }, [API_BASE]);
+  }, []);
+
+  // ... rest of your AuthProvider code remains the same
 
   const signup = async (name, email, password, phone = "", profilePic = "") => {
     try {
@@ -136,8 +151,8 @@ export function AuthProvider({ children }) {
       login, 
       logout, 
       signup,
-      testAPIConnection, // Add test function to context
-      API_BASE // Expose API_BASE for debugging
+      testAPIConnection,
+      API_BASE
     }}>
       {children}
     </AuthContext.Provider>
@@ -151,6 +166,3 @@ export function useAuth() {
   }
   return context;
 }
-
-// Export the API_BASE for external use if needed
-export const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000";
