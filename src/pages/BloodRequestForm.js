@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import "./BloodRequestForm.css";
 
 function BloodRequestForm() {
-  const { API_BASE } = useAuth();
+  const { user, API_BASE } = useAuth();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     patientName: "",
     hospitalName: "",
@@ -19,25 +22,37 @@ function BloodRequestForm() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((s) => ({ ...s, [name]: type === "checkbox" ? checked : value }));
+    setFormData((s) => ({
+      ...s,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus(null);
+
     try {
       const res = await fetch(`${API_BASE}/api/requests`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(formData),
       });
+
       if (!res.ok) {
         const err = await res.json().catch(() => ({ message: "Unknown error" }));
-        setSubmitStatus({ type: "error", message: err.message || "Submit failed" });
+        setSubmitStatus({
+          type: "error",
+          message: err.message || "Submit failed",
+        });
       } else {
         await res.json();
-        setSubmitStatus({ type: "success", message: "Request submitted successfully" });
+        setSubmitStatus({
+          type: "success",
+          message: "Request submitted successfully",
+        });
         setFormData({
           patientName: "",
           hospitalName: "",
@@ -57,19 +72,61 @@ function BloodRequestForm() {
     }
   };
 
+  // If user is not logged in
+  if (!user) {
+    return (
+      <div className="form-container">
+        <div className="login-message-card">
+          <p>You have to log in to see the contents of this page.</p>
+          <button onClick={() => navigate("/login")}>Go to Login</button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <section className="brf-page">
       <div className="brf-card">
         <div className="brf-header">
           <div className="brf-title">
-            <svg className="brf-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2v10" stroke="#b71c1c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M5 12h14" stroke="#b71c1c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <circle cx="12" cy="17" r="4" stroke="#b71c1c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg
+              className="brf-icon"
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2v10"
+                stroke="#b71c1c"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M5 12h14"
+                stroke="#b71c1c"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle
+                cx="12"
+                cy="17"
+                r="4"
+                stroke="#b71c1c"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
             <h2>Request Blood</h2>
           </div>
-          <p className="brf-sub">Submit urgent or routine blood requests. Emergency toggle highlights urgency.</p>
+          <p className="brf-sub">
+            Submit urgent or routine blood requests. Emergency toggle highlights
+            urgency.
+          </p>
         </div>
 
         {submitStatus && (
@@ -167,7 +224,10 @@ function BloodRequestForm() {
           <div className="emergency-row full">
             <span className="emergency-left">
               <strong>Emergency</strong>
-              <span className="emergency-help">  (Mark if immediate attention required)</span>
+              <span className="emergency-help">
+                {" "}
+                (Mark if immediate attention required)
+              </span>
             </span>
 
             <label className={`switch ${isSubmitting ? "disabled" : ""}`}>
@@ -183,15 +243,21 @@ function BloodRequestForm() {
             </label>
           </div>
 
-          <button className="submit-btn full" type="submit" disabled={isSubmitting}>
+          <button
+            className="submit-btn full"
+            type="submit"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "Submitting..." : "Submit Request"}
           </button>
         </form>
+
         <aside className="brf-side">
           <div className="side-badge">⚕️</div>
           <div className="side-title">Quick Tips</div>
           <div className="side-text">
-            Use the Emergency toggle for life‑threatening needs. Provide accurate contact info so donors can reach you fast.
+            Use the Emergency toggle for life-threatening needs. Provide
+            accurate contact info so donors can reach you fast.
           </div>
         </aside>
       </div>

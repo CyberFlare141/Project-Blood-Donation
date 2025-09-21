@@ -1,15 +1,19 @@
 import express from "express";
-import dotenv from "dotenv";
+import mongoose from "mongoose";
 import cors from "cors";
+
+import dotenv from "dotenv";
+
 import connectDB from "./config/db.js";
 import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/auth.js";
-import requestRoutes from "./routes/request.js";
 
 dotenv.config();
-
+console.log("Email user:", process.env.EMAIL_USER ? "Loaded" : "Missing");
+console.log("Email pass:", process.env.EMAIL_PASS ? "Loaded" : "Missing");
 const app = express();
+
 
 // Simplified CORS configuration
 app.use(cors({
@@ -27,6 +31,7 @@ app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
   next();
 });
+
 
 // Debug middleware to see CORS requests
 app.use((req, res, next) => {
@@ -49,7 +54,7 @@ app.get("/api/health", (req, res) => {
 
 // Your routes
 app.use("/api/auth", authRoutes);
-app.use("/api/requests", requestRoutes);
+
 
 // 404 handler
 app.use((req, res) => {
@@ -71,3 +76,4 @@ app.listen(PORT, () => {
   console.log(`✅ CORS enabled for: http://localhost:3000`);
   connectDB();
 });
+

@@ -1,16 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import axios from "axios";
 
 const AuthContext = createContext();
 
-// Export the API_BASE for external use if needed
-export const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5001";
+// API base URL (from env or fallback)
+export const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000";
 
-// DEBUG: Check what environment variables are available
-console.log("🔍 Environment variables:", {
-  REACT_APP_API_BASE: process.env.REACT_APP_API_BASE,
-  NODE_ENV: process.env.NODE_ENV,
-  API_BASE_FINAL: API_BASE
-});
+console.log("🔧 API_BASE in AuthContext:", API_BASE);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
@@ -18,25 +14,27 @@ export function AuthProvider({ children }) {
     return stored ? JSON.parse(stored) : null;
   });
 
-  // Debug: Log the API_BASE being used
-  console.log("🔧 API_BASE in AuthProvider:", API_BASE);
-
+  // Persist user in localStorage
   useEffect(() => {
     if (user) localStorage.setItem("user", JSON.stringify(user));
     else localStorage.removeItem("user");
   }, [user]);
 
+  // Restore session on refresh
   useEffect(() => {
     const restore = async () => {
       try {
-        console.log("🔄 Attempting to restore session from:", `${API_BASE}/api/auth/me`);
+        console.log("🔄 Checking session:", `${API_BASE}/api/auth/me`);
         const res = await fetch(`${API_BASE}/api/auth/me`, {
           credentials: "include",
         });
         console.log("🔄 /api/auth/me status:", res.status);
-        // parse JSON safely (some errors return empty body)
+
+        if (!res.ok) return;
+
         const data = await res.json().catch(() => null);
         console.log("🔄 /api/auth/me data:", data);
+
         const restoredUser = data?.user ?? data;
         if (restoredUser) setUser(restoredUser);
       } catch (e) {
@@ -46,114 +44,78 @@ export function AuthProvider({ children }) {
     restore();
   }, []);
 
-  // ... rest of your AuthProvider code remains the same
-
-  const signup = async (name, email, password, phone = "", profilePic = "") => {
+  // === Signup step 1 (request OTP) ===
+  const signupRequest = async (name, email, password, phone = "", profilePic = "") => {
     try {
-      const url = `${API_BASE}/api/auth/signup`;
-      console.log("🔗 Signup - Attempting to connect to:", url);
-
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ name, email, password, phone, profilePic }),
+      const res = await axios.post(`${API_BASE}/api/auth/signup-request`, {
+        name, email, password, phone, profilePic
       });
-
-      console.log("📨 Signup - Response status:", res.status);
-      const data = await res.json().catch(() => null);
-      console.log("📨 Signup - Response data:", data);
-
-      if (!res.ok) {
-        console.error("Signup failed:", data);
-        alert(data?.message || "Signup failed");
-        return false;
-      }
-
-      const newUser = data?.user ?? data;
-      setUser(newUser);
-      return true;
-    } catch (e) {
-      console.error("❌ Signup failed:", e);
-      alert("Signup failed (network/server error)");
+      return res.data.success;
+    } catch (err) {
+      alert(err.response?.data?.message || "Signup request failed");
       return false;
     }
   };
 
-  const login = async (email, password) => {
+  // === Signup step 2 (verify OTP) ===
+  const signupVerify = async (email, otp) => {
     try {
-      const url = `${API_BASE}/api/auth/login`;
-      console.log("🔗 Login - Attempting to connect to:", url);
+      const res = await axios.post(
+        `${API_BASE}/api/auth/signup-verify`,
+        { email, otp },
+        { withCredentials: true }
+      );
+      if (res.data.user) setUser(res.data.user);
+      return res.data.user;
+    } catch (err) {
+      alert(err.response?.data?.message || "Signup verification failed");
+      return null;
+    }
+  };
 
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
-
-      console.log("📨 Login - Response status:", res.status);
-      const data = await res.json().catch(() => null);
-      console.log("📨 Login - Response data:", data);
-
-      if (!res.ok) {
-        console.error("Login failed:", data);
-        alert(data?.message || "Login failed");
-        return false;
-      }
-
-      const loggedUser = data?.user ?? data;
-      setUser(loggedUser);
-      return true;
-    } catch (e) {
-      console.error("❌ Login failed:", e);
-      alert("Login failed (network/server error)");
+  // === Login step 1 (request OTP) ===
+  const loginRequest = async (email, password) => {
+    try {
+      const res = await axios.post(`${API_BASE}/api/auth/login-request`, { email, password });
+      return res.data.success;
+    } catch (err) {
+      alert(err.response?.data?.message || "Login request failed");
       return false;
     }
   };
 
+  // === Login step 2 (verify OTP) ===
+  const loginVerify = async (email, otp) => {
+    try {
+      const res = await axios.post(
+        `${API_BASE}/api/auth/login-verify`,
+        { email, otp },
+        { withCredentials: true }
+      );
+      if (res.data.user) setUser(res.data.user);
+      return res.data.user;
+    } catch (err) {
+      alert(err.response?.data?.message || "OTP verification failed");
+      return null;
+    }
+  };
+
+  // === Logout ===
   const logout = async () => {
     try {
-      console.log("👋 Logging out user");
-      await fetch(`${API_BASE}/api/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
+      await axios.post(`${API_BASE}/api/auth/logout`, {}, { withCredentials: true });
     } catch (e) {
-      console.error("Logout request failed:", e);
+      console.error("Logout error:", e);
     } finally {
       setUser(null);
       localStorage.removeItem("user");
     }
   };
 
-  // Add a test function to check API connection
-  const testAPIConnection = async () => {
-    try {
-      const url = `${API_BASE}/api/health`;
-      console.log("🧪 Testing API connection to:", url);
-      
-      const res = await fetch(url);
-      const data = await res.json();
-      
-      console.log("✅ API Connection Test - Success:", data);
-      return data;
-    } catch (error) {
-      console.error("❌ API Connection Test - Failed:", error);
-      return null;
-    }
-  };
-
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      setUser, 
-      login, 
-      logout, 
-      signup,
-      testAPIConnection,
-      API_BASE
-    }}>
+    <AuthContext.Provider
+      value={{ user, setUser, signupRequest, signupVerify, loginRequest, loginVerify, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
