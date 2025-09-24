@@ -347,7 +347,7 @@ html, body, #root {
   color: #2a9d8f;
 }
 
-.eligibility-result.warning h3 {
+.eligibility.result.warning h3 {
   color: #e63946;
 }
 
@@ -456,38 +456,38 @@ form button:hover {
   }
 }
 
-@media (max-width: 480px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .blood-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .hero-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .cta-button {
-    width: 100%;
-    max-width: 250px;
-    margin-bottom: 0.5rem;
-  }
-  
-  /* Form container adjustments for small mobile */
-  .form-container {
-    max-width: 95%;
-    margin: 20px auto;
-    padding: 15px;
-  }
-  
-  form input, form select, form button {
-    padding: 10px;
-    font-size: 14px;
-  }
+/* ======== Responsive helpers (added) ======== */
+/* Make containers fluid with safe padding on all devices */
+.container { padding-left: 1rem; padding-right: 1rem; box-sizing: border-box; }
+
+/* Ensure visual elements scale */
+.hero-visual, .blood-drop-icon, .profile-avatar, img { max-width: 100%; height: auto; }
+
+/* Buttons in eligibility card become stacked and full width on small screens */
+.eligibility-buttons button {
+  min-width: 140px;
+  padding: 0.6rem 1rem;
+  border-radius: 50px;
 }
+@media (max-width: 480px) {
+  .eligibility-buttons { flex-direction: column; gap: 0.6rem; align-items: stretch; }
+  .eligibility-buttons button { width: 100%; min-width: 0; }
+  .hero-section { padding: 1.5rem 0; }
+  .hero-content, .hero-visual { padding: 0.8rem; }
+}
+
+/* Ensure level-fill always shows even for very small percentages */
+.level-fill { min-width: 6px; }
+
+/* Prevent badge overflow */
+.badge-pill { word-break: keep-all; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0.25rem 0.6rem; }
+
+/* Improve grid wrapping for very small devices */
+@media (max-width: 360px) {
+  .blood-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
+  .action-cards { gap: 1rem; }
+}
+
 /* Navbar */
 .navbar {
   position: sticky;

@@ -178,6 +178,43 @@
   box-shadow: 0 6px 20px rgba(13,18,23,0.03);
 }
 
-/* Responsive */
-@media (max-width: 880px) { .dashboard-table { min-width: 720px; } }
-@media (max-width: 520px) { .dashboard-table { min-width: 600px; font-size: 13px; } }
+/* ======== Responsive table -> stacked cards on narrow screens ======== */
+@media (max-width: 880px) {
+  .controls { flex-direction: column; gap: 10px; align-items: stretch; }
+  .control-stats { margin-left: 0; }
+
+  /* Make table horizontally scrollable as fallback */
+  .table-wrap { overflow-x: auto; }
+
+  /* Turn table into stacked cards for very small widths */
+  .dashboard-table { width: 100%; border: 0; min-width: 0; }
+  .dashboard-table thead { display: none; }
+  .dashboard-table tbody tr {
+    display: block;
+    background: #fff;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 6px 20px rgba(13,18,23,0.03);
+  }
+  .dashboard-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: none;
+    font-size: 14px;
+  }
+  .dashboard-table tbody td:first-child { font-weight: 700; color: #333; width: 55%; }
+  .dashboard-table .blood-type-badge { margin-left: 8px; }
+  .dashboard-table tbody td a { word-break: break-word; }
+
+  .dashboard-table tbody tr .accept-btn { margin-top: 8px; width: 100%; }
+}
+
+/* Ensure pills & badges shrink on small devices */
+@media (max-width: 520px) {
+  .blood-type-badge { padding: 6px 8px; font-size: 12px; }
+  .emergency-pill, .ok-pill { padding: 4px 8px; font-size: 12px; }
+  .accept-btn { padding: 8px 10px; font-size: 13px; }
+}
