@@ -4,14 +4,13 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
-import Instruction from './pages/Instruction';
 import FAQ from './pages/FAQ';
 import ContactUs from './pages/ContactUs';
 import { AuthProvider } from './context/AuthContext';
 import Layout from './components/Layout';
 import BloodRequestForm from './pages/BloodRequestForm';
 import Dashboard from './pages/Dashboard';
-import PrivateRoute from './components/PrivateRoute';  // ✅ new
+import PrivateRoute from './components/PrivateRoute';  
 
 function App() {
   return (
@@ -22,8 +21,6 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/" element={<Home />} />
-
-            {/* Protected routes with message */}
             <Route path="/profile" element={
               <PrivateRoute><Profile /></PrivateRoute>
             } />
@@ -32,7 +29,6 @@ function App() {
             } />
 
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/instruction" element={<Instruction />} />
             <Route path="/contactus" element={<ContactUs />} />
             <Route path="/faq" element={<FAQ />} />
           </Routes>

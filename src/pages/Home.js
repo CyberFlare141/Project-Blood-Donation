@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import "./Home.css";
-
-// All blood types
+import ResponsiveNav from "../components/ResponsiveNav"; 
+ 
 const allBloodTypes = ["O-", "O+", "A-", "A+", "B-", "B+", "AB-", "AB+"];
 
 function Home() {
@@ -10,7 +10,7 @@ function Home() {
   const [bloodNeeded, setBloodNeeded] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // Eligibility checker state
+ 
   const [eligibilityAnswers, setEligibilityAnswers] = useState({
     age: null,
     vaccine: null,
@@ -40,7 +40,7 @@ function Home() {
     }
   ];
 
-  // Fetch current blood requests
+ 
   useEffect(() => {
     const fetchNeeded = async () => {
       try {
@@ -48,10 +48,10 @@ function Home() {
         const res = await fetch(`${API_BASE}/api/requests/inventory`);
         const data = await res.json();
 
-        // Compute "blood needed" by blood type from requests
+       
         const needed = {};
         allBloodTypes.forEach(type => {
-          needed[type] = data[type] || 0; // show 0 if none requested
+          needed[type] = data[type] || 0;  
         });
 
         setBloodNeeded(needed);
@@ -99,8 +99,9 @@ function Home() {
   };
 
   return (
+    <> <ResponsiveNav />
     <div className="home-page">
-      {/* Hero Section */}
+ 
       <section className="hero-section">
         <div className="hero-content">
           <div className="badge-pill">Life Saver</div>
@@ -112,7 +113,7 @@ function Home() {
         </div>
       </section>
 
-      {/* Blood Needed Section */}
+ 
       <section className="inventory-section">
         <div className="container">
           <h2>Current Blood Needed</h2>
@@ -139,8 +140,7 @@ function Home() {
           )}
         </div>
       </section>
-
-      {/* Eligibility Checker */}
+ 
       <section className="eligibility-section">
         <div className="container">
           <h2>Eligibility Checker</h2>
@@ -183,7 +183,7 @@ function Home() {
         </div>
       </section>
 
-      {/* Static Stats Section */}
+  
       <section className="stats-section">
         <div className="container">
           <div className="badge-pill light-badge">Our Impact</div>
@@ -195,6 +195,7 @@ function Home() {
         </div>
       </section>
     </div>
+    </>
   );
 }
 

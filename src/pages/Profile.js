@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "./Profile.css";
-
+import ResponsiveNav from "../components/ResponsiveNav"; 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
 
 function Profile() {
@@ -114,6 +114,8 @@ function Profile() {
   if (!profile) return <div style={{ color: "#555" }}>No profile data found</div>;
 
   return (
+    <>
+    <ResponsiveNav />
     <div className="profile-container">
       <div className="profile-card">
         <img
@@ -179,6 +181,7 @@ function Profile() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

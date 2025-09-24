@@ -2,7 +2,7 @@
 import React from "react";
 import { Accordion, Container, Row, Col } from "react-bootstrap";
 import './Faq.css'; 
-
+import ResponsiveNav from "../components/ResponsiveNav"; 
 const faqs = [
   { question: "Can I donate blood if I have a tattoo?", answer: "Yes, but you may need to wait for a certain period depending on your location." },
   { question: "How often can I donate blood?", answer: "Typically, every 8–12 weeks, depending on your health and blood type." },
@@ -15,6 +15,7 @@ const faqs = [
 
 const FAQ = () => {
   return (
+    <> <ResponsiveNav />
     <div className="faq-page">
       <div className="faq-header">
         <h1>Frequently Asked Questions</h1>
@@ -39,6 +40,7 @@ const FAQ = () => {
         © 2024 Be a Hero – Blood Donation. All rights reserved.
       </footer>
     </div>
+    </>
   );
 };
 

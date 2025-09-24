@@ -1,0 +1,108 @@
+.resp-nav {
+  position: sticky;
+  top: 0;
+  z-index: 1200;
+  background: rgba(255,255,255,0.98);
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  backdrop-filter: blur(6px);
+}
+.resp-nav .nav-inner {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 0.5rem 1rem;
+  max-width:1200px;
+  margin:0 auto;
+  position: relative; /* moved to allow absolute positioning of hamburger */
+}
+.resp-nav .nav-left { display:flex; align-items:center; gap:12px; }
+.nav-brand { font-weight:700; color:#b71c1c; text-decoration:none; font-size:1.05rem; }
+
+/* desktop links */
+.nav-links {
+  display:flex;
+  gap:12px;
+  list-style:none;
+  margin:0;
+  padding:0;
+}
+.nav-links li a { color:#333; text-decoration:none; padding:8px 10px; border-radius:8px; }
+.nav-links li.active a { background:#f8dede; color:#b71c1c; font-weight:700; }
+
+/* hamburger - visible on small */
+.hamburger-btn {
+  display:none;
+  background:none;
+  border:0;
+  padding:6px;
+  cursor:pointer;
+
+  /* new: place hamburger at top-right on small devices */
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1250;
+}
+.hamburger-btn .bar {
+  display:block;
+  width:22px;
+  height:3px;
+  background:#333;
+  margin:3px 0;
+  border-radius:2px;
+}
+
+/* sidebar overlay & panel */
+.side-overlay {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.25);
+  opacity:0;
+  visibility:hidden;
+  transition:all 180ms ease;
+  z-index:1190;
+}
+.side-overlay.open { opacity:1; visibility:visible; }
+
+.side-panel {
+  position:fixed;
+  top:0;
+  left:-320px;
+  width:320px;
+  max-width:85%;
+  height:100%;
+  background:#fff;
+  box-shadow: 6px 0 30px rgba(0,0,0,0.12);
+  transition:left 220ms ease;
+  z-index:1200;
+  display:flex;
+  flex-direction:column;
+}
+.side-panel.open { left:0; }
+.side-head {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:1rem;
+  border-bottom:1px solid #f0f0f0;
+}
+.close-btn { background:none; border:0; font-size:1.6rem; cursor:pointer; line-height:1; }
+
+.side-links { list-style:none; margin:0; padding:12px; display:flex; flex-direction:column; gap:6px; }
+.side-links li a { display:block; padding:10px 12px; color:#333; text-decoration:none; border-radius:8px; }
+.side-links li.active a { background:#f8dede; color:#b71c1c; font-weight:700; }
+
+/* Responsive behavior */
+@media (max-width: 900px) {
+  .nav-links { display:none; }
+  .hamburger-btn { display:block; }
+
+  /* ensure brand stays left and has room from the hamburger */
+  .nav-brand { margin-right: 48px; }
+}
+
+/* small desktop tweak */
+@media (min-width: 901px) {
+  .side-panel, .side-overlay { display:none; }
+}

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "./BloodRequestForm.css";
-
+import ResponsiveNav from "../components/ResponsiveNav"; 
 function BloodRequestForm() {
   const { user, API_BASE } = useAuth();
   const navigate = useNavigate();
@@ -81,6 +81,7 @@ function BloodRequestForm() {
   }
 
   return (
+    <> <ResponsiveNav /> 
     <section className="brf-page">
       <div className="brf-card">
         <h2>Request Blood</h2>
@@ -121,6 +122,7 @@ function BloodRequestForm() {
         </form>
       </div>
     </section>
+    </>
   );
 }
 
