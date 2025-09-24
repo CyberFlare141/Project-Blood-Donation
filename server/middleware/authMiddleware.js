@@ -26,7 +26,6 @@ export const authMiddleware = async (req, res, next) => {
       return res.status(401).json({ message: "User not found" });
     }
 
-    // If token contains a version, ensure it matches the user's current tokenVersion
     if (typeof decoded.v !== "undefined" && decoded.v !== (user.tokenVersion ?? 0)) {
       return res.status(401).json({ message: "Token revoked" });
     }

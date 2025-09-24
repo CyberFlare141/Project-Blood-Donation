@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Card, Form, Button } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-
+import ResponsiveNav from "../components/ResponsiveNav";
 function Login() {
   const { loginRequest, loginVerify } = useAuth();
   const navigate = useNavigate();
@@ -50,6 +50,7 @@ function Login() {
   };
 
   return (
+    <><ResponsiveNav />
     <Card className="p-4" style={{ maxWidth: "400px", margin: "100px auto" }}>
       <h3>Login</h3>
       {error && <p style={{ color: "red" }}>{error}</p>}
@@ -107,6 +108,7 @@ function Login() {
         </p>
       )}
     </Card>
+    </>
   );
 }
 

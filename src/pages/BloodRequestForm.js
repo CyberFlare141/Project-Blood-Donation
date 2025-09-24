@@ -69,59 +69,60 @@ function BloodRequestForm() {
     }
   };
 
-  if (!user) {
-    return (
-      <div className="form-container">
-        <div className="login-message-card">
-          <p>You have to log in to submit requests.</p>
-          <button onClick={() => navigate("/login")}>Go to Login</button>
-        </div>
-      </div>
-    );
-  }
-
+  // Render nav always, then show login prompt or form
   return (
-    <> <ResponsiveNav /> 
-    <section className="brf-page">
-      <div className="brf-card">
-        <h2>Request Blood</h2>
-        {submitStatus && <div className={`brf-status ${submitStatus.type}`}>{submitStatus.message}</div>}
-        <form className="brf-form" onSubmit={handleSubmit}>
-          <input name="patientName" placeholder="Patient Name" value={formData.patientName} onChange={handleChange} required disabled={isSubmitting} />
-          <input name="hospitalName" placeholder="Hospital Name" value={formData.hospitalName} onChange={handleChange} required disabled={isSubmitting} />
-          <select name="city" value={formData.city} onChange={handleChange} required disabled={isSubmitting}>
-            <option value="">Select City</option>
-            <option value="Dhaka">Dhaka</option>
-            <option value="Chittagong">Chittagong</option>
-            <option value="Khulna">Khulna</option>
-            <option value="Rajshahi">Rajshahi</option>
-            <option value="Mymensingh">Mymensingh</option>
-            <option value="Barisal">Barisal</option>
-            <option value="Sylhet">Sylhet</option>
-          </select>
-          <select name="bloodType" value={formData.bloodType} onChange={handleChange} required disabled={isSubmitting}>
-            <option value="">Select Blood Type</option>
-            <option value="A+">A+</option>
-            <option value="A-">A-</option>
-            <option value="B+">B+</option>
-            <option value="B-">B-</option>
-            <option value="O+">O+</option>
-            <option value="O-">O-</option>
-            <option value="AB+">AB+</option>
-            <option value="AB-">AB-</option>
-          </select>
-          <input type="date" name="date" value={formData.date} onChange={handleChange} required disabled={isSubmitting} />
-          <input type="time" name="time" value={formData.time} onChange={handleChange} required disabled={isSubmitting} />
-          <input type="text" name="contactNumber" placeholder="Contact Number" value={formData.contactNumber} onChange={handleChange} required disabled={isSubmitting} />
-          <input type="number" name="unitsRequested" placeholder="Units Needed" value={formData.unitsRequested} onChange={handleChange} min="1" required disabled={isSubmitting} />
-          <label>
-            Emergency
-            <input type="checkbox" name="emergency" checked={formData.emergency} onChange={handleChange} disabled={isSubmitting} />
-          </label>
-          <button type="submit" disabled={isSubmitting}>{isSubmitting ? "Submitting..." : "Submit Request"}</button>
-        </form>
-      </div>
-    </section>
+    <>
+      <ResponsiveNav />
+
+      {!user ? (
+        <div className="form-container">
+          <div className="login-message-card">
+            <p>You have to log in to submit requests.</p>
+            <button onClick={() => navigate("/login")}>Go to Login</button>
+          </div>
+        </div>
+      ) : (
+        <section className="brf-page">
+          <div className="brf-card">
+            <h2>Request Blood</h2>
+            {submitStatus && <div className={`brf-status ${submitStatus.type}`}>{submitStatus.message}</div>}
+            <form className="brf-form" onSubmit={handleSubmit}>
+              <input name="patientName" placeholder="Patient Name" value={formData.patientName} onChange={handleChange} required disabled={isSubmitting} />
+              <input name="hospitalName" placeholder="Hospital Name" value={formData.hospitalName} onChange={handleChange} required disabled={isSubmitting} />
+              <select name="city" value={formData.city} onChange={handleChange} required disabled={isSubmitting}>
+                <option value="">Select City</option>
+                <option value="Dhaka">Dhaka</option>
+                <option value="Chittagong">Chittagong</option>
+                <option value="Khulna">Khulna</option>
+                <option value="Rajshahi">Rajshahi</option>
+                <option value="Mymensingh">Mymensingh</option>
+                <option value="Barisal">Barisal</option>
+                <option value="Sylhet">Sylhet</option>
+              </select>
+              <select name="bloodType" value={formData.bloodType} onChange={handleChange} required disabled={isSubmitting}>
+                <option value="">Select Blood Type</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+              </select>
+              <input type="date" name="date" value={formData.date} onChange={handleChange} required disabled={isSubmitting} />
+              <input type="time" name="time" value={formData.time} onChange={handleChange} required disabled={isSubmitting} />
+              <input type="text" name="contactNumber" placeholder="Contact Number" value={formData.contactNumber} onChange={handleChange} required disabled={isSubmitting} />
+              <input type="number" name="unitsRequested" placeholder="Units Needed" value={formData.unitsRequested} onChange={handleChange} min="1" required disabled={isSubmitting} />
+              <label>
+                Emergency
+                <input type="checkbox" name="emergency" checked={formData.emergency} onChange={handleChange} disabled={isSubmitting} />
+              </label>
+              <button type="submit" disabled={isSubmitting}>{isSubmitting ? "Submitting..." : "Submit Request"}</button>
+            </form>
+          </div>
+        </section>
+      )}
     </>
   );
 }

@@ -1,12 +1,11 @@
 import express from "express";
-import Blood from "../models/Blood.js"; // Or your inventory model
+import Blood from "../models/Blood.js"; 
 
 const router = express.Router();
 
-// GET /api/blood-inventory
 router.get("/blood-inventory", async (req, res) => {
   try {
-    const inventory = await Blood.find(); // Or however you store blood units
+    const inventory = await Blood.find(); 
     res.json(inventory);
   } catch (err) {
     console.error(err);

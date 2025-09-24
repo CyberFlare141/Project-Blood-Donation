@@ -2,18 +2,14 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import Request from "../models/Request.js"; // Blood requests model
+import Request from "../models/Request.js"; 
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 
 dotenv.config();
 const router = express.Router();
-
-// Temporary OTP stores
 const signupOtpStore = {};
 const loginOtpStore = {};
-
-// Nodemailer setup
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
@@ -22,7 +18,6 @@ transporter.verify()
   .then(() => console.log("Nodemailer ready"))
   .catch(console.warn);
 
-// JWT helper
 const sendToken = (user, res) => {
   const payload = { id: user._id, v: user.tokenVersion ?? 0 };
   const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "3d" });
@@ -180,10 +175,10 @@ const requireAuth = async (req, res, next) => {
   }
 };
 
-// ===== Get current user =====
+// Get current user 
 router.get("/me", requireAuth, (req, res) => res.json({ user: req.user }));
 
-// ===== Update user =====
+// Update user
 router.put("/me", requireAuth, async (req, res) => {
   try {
     const { name, phone, profilePic, bloodGroup } = req.body;
@@ -203,7 +198,7 @@ router.put("/me", requireAuth, async (req, res) => {
   }
 });
 
-// ===== Accept blood request =====
+// Accept blood request 
 router.post("/requests/:id/accept", requireAuth, async (req, res) => {
   try {
     const request = await Request.findById(req.params.id);
@@ -231,7 +226,7 @@ router.post("/requests/:id/accept", requireAuth, async (req, res) => {
   }
 });
 
-// ===== Revoke JWTs =====
+//Revoke JWTs 
 router.post("/revoke", requireAuth, async (req, res) => {
   try {
     const user = await User.findById(req.user._id);

@@ -8,7 +8,6 @@ import connectDB from "./config/db.js";
 import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/auth.js";
-// fix: import the actual requests router file (it's named request.js)
 import requestsRoutes from "./routes/request.js";
 import bloodRoutes from "./routes/blood.js";
 
@@ -20,9 +19,8 @@ console.log("Email pass:", process.env.EMAIL_PASS ? "Loaded" : "Missing");
 const app = express();
 
 app.use("/api", bloodRoutes);
-// Simplified CORS configuration
 app.use(cors({
-  origin: "http://localhost:3000", // Your React app
+  origin: "http://localhost:3000", 
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
@@ -30,15 +28,11 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
-
-// Request logging middleware
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
   next();
 });
 
-
-// Debug middleware to see CORS requests
 app.use((req, res, next) => {
   console.log('Request received:', {
     method: req.method,
@@ -57,7 +51,6 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Your routes
 app.use("/api/auth", authRoutes);
 app.use("/api/requests", requestsRoutes);
 
@@ -73,9 +66,8 @@ app.use((error, req, res, next) => {
   res.status(500).json({ message: "Internal server error" });
 });
 
-// Helper: sign JWT and set cookie
+
 const sendToken = (user, res) => {
-  // include user.tokenVersion so tokens can be revoked server-side by bumping this value
   const payload = { id: user._id, v: user.tokenVersion ?? 0 };
   const token = jwt.sign(payload, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN || "3d",
@@ -102,7 +94,6 @@ const sendToken = (user, res) => {
   });
 };
 
-// Use port from environment or default to 5001
 const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import emailjs from "@emailjs/browser";
 import "./ContactUs.css";
-
+import ResponsiveNav from "../components/ResponsiveNav"; 
 function ContactUs() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [location, setLocation] = useState("");
@@ -52,20 +52,21 @@ function ContactUs() {
   };
 
   return (
+    <>
+    <ResponsiveNav />
     <div className="contact-container">
-      {/* Header */}
       <div className="contact-header">
         <h1>Contact Us</h1>
         <p>We'd love to hear from you! Reach out with questions, feedback, or partnership inquiries.</p>
       </div>
 
-      {/* Get in Touch Section */}
+
       <div className="get-in-touch">
         <div className="contact-card">
           <h2>Get in Touch</h2>
           <p>Please fill out the form below and optionally share your location.</p>
 
-          {/* Contact Form */}
+    
           <form className="contact-form" onSubmit={handleSubmit}>
             <input
               type="text"
@@ -114,7 +115,6 @@ function ContactUs() {
         </div>
       </div>
 
-      {/* Map Section */}
       <div className="map-section">
         <a
           href={location ? `https://maps.google.com/?q=${location}` : "#"}
@@ -128,11 +128,11 @@ function ContactUs() {
         </a>
       </div>
 
-      {/* Footer */}
       <footer className="contact-footer">
         © 2024 Be a Hero – Blood Donation. All rights reserved.
       </footer>
     </div>
+    </>
   );
 }
 
