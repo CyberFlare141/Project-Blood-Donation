@@ -70,6 +70,35 @@ app.use((error, req, res, next) => {
   res.status(500).json({ message: "Internal server error" });
 });
 
+// Helper: sign JWT and set cookie
+const sendToken = (user, res) => {
+  // include user.tokenVersion so tokens can be revoked server-side by bumping this value
+  const payload = { id: user._id, v: user.tokenVersion ?? 0 };
+  const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN || "3d",
+  });
+
+  const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+    maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
+  };
+
+  res.cookie("token", token, cookieOptions);
+
+  return res.json({
+    message: "Auth successful",
+    user: {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      profilePic: user.profilePic,
+    },
+  });
+};
+
 // Use port from environment or default to 5001
 const PORT = process.env.PORT || 5001;
 

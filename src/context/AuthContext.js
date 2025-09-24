@@ -9,36 +9,51 @@ export const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000
 console.log("🔧 API_BASE in AuthContext:", API_BASE);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem("user");
-    return stored ? JSON.parse(stored) : null;
-  });
+  // Do NOT trust localStorage on initialization. Start null and perform server verification.
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // indicate restore in progress
 
-  // Persist user in localStorage
+  // Persist user in localStorage when setUser is called successfully
   useEffect(() => {
     if (user) localStorage.setItem("user", JSON.stringify(user));
     else localStorage.removeItem("user");
   }, [user]);
 
-  // Restore session on refresh
+  // Restore session on refresh: call server /api/auth/me to verify cookie/token
   useEffect(() => {
     const restore = async () => {
       try {
+        setLoading(true);
         console.log("🔄 Checking session:", `${API_BASE}/api/auth/me`);
         const res = await fetch(`${API_BASE}/api/auth/me`, {
           credentials: "include",
         });
         console.log("🔄 /api/auth/me status:", res.status);
 
-        if (!res.ok) return;
+        if (!res.ok) {
+          // clear any stale local storage if server doesn't validate session
+          setUser(null);
+          localStorage.removeItem("user");
+          return;
+        }
 
         const data = await res.json().catch(() => null);
         console.log("🔄 /api/auth/me data:", data);
 
         const restoredUser = data?.user ?? data;
-        if (restoredUser) setUser(restoredUser);
+        if (restoredUser) {
+          setUser(restoredUser);
+          localStorage.setItem("user", JSON.stringify(restoredUser));
+        } else {
+          setUser(null);
+          localStorage.removeItem("user");
+        }
       } catch (e) {
         console.error("Failed to restore session:", e);
+        setUser(null);
+        localStorage.removeItem("user");
+      } finally {
+        setLoading(false);
       }
     };
     restore();
@@ -65,7 +80,10 @@ export function AuthProvider({ children }) {
         { email, otp },
         { withCredentials: true }
       );
-      if (res.data.user) setUser(res.data.user);
+      if (res.data.user) {
+        setUser(res.data.user);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+      }
       return res.data.user;
     } catch (err) {
       alert(err.response?.data?.message || "Signup verification failed");
@@ -92,7 +110,10 @@ export function AuthProvider({ children }) {
         { email, otp },
         { withCredentials: true }
       );
-      if (res.data.user) setUser(res.data.user);
+      if (res.data.user) {
+        setUser(res.data.user);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+      }
       return res.data.user;
     } catch (err) {
       alert(err.response?.data?.message || "OTP verification failed");
@@ -114,8 +135,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      // include API_BASE so consumers like Dashboard and BloodRequestForm receive it
-      value={{ user, setUser, signupRequest, signupVerify, loginRequest, loginVerify, logout, API_BASE }}
+      value={{ user, setUser, signupRequest, signupVerify, loginRequest, loginVerify, logout, API_BASE, loading }}
     >
       {children}
     </AuthContext.Provider>

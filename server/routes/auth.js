@@ -16,8 +16,10 @@ const loginOtpStore = {};
 
 // Helper: sign JWT and set cookie
 const sendToken = (user, res) => {
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "3d",
+  // include token version so tokens can be revoked server-side
+  const payload = { id: user._id, v: user.tokenVersion ?? 0 };
+  const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN || "3d",
   });
 
   const cookieOptions = {
@@ -194,9 +196,21 @@ const requireAuth = async (req, res, next) => {
     const token = req.cookies?.token;
     if (!token) return res.status(401).json({ message: "Not authenticated" });
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      console.error("JWT verify failed:", err);
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+
     const user = await User.findById(decoded.id).select("-password");
     if (!user) return res.status(401).json({ message: "User not found" });
+
+    // ensure token version matches DB -> allows server-side revocation
+    if (typeof decoded.v !== "undefined" && decoded.v !== (user.tokenVersion ?? 0)) {
+      return res.status(401).json({ message: "Token revoked" });
+    }
 
     req.user = user;
     next();
@@ -275,6 +289,29 @@ router.put("/profile/:id", requireAuth, async (req, res) => {
     return res.json(safeUser);
   } catch (err) {
     console.error("PUT /profile/:id error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Add endpoint to revoke (increment tokenVersion) for current user
+router.post("/revoke", requireAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.tokenVersion = (user.tokenVersion ?? 0) + 1;
+    await user.save();
+
+    // Clear cookie for immediate client-side logout
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+    });
+
+    return res.json({ success: true, message: "Tokens revoked for this account" });
+  } catch (err) {
+    console.error("Revoke error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });
