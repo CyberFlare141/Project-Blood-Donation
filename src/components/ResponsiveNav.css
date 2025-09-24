@@ -104,5 +104,9 @@
 
 /* small desktop tweak */
 @media (min-width: 901px) {
-  .side-panel, .side-overlay { display:none; }
+  /* hide the mobile/responsive nav on large/desktop screens */
+  .resp-nav { display: none !important; }
+
+  /* keep sidebar and overlay hidden on desktop too */
+  .side-panel, .side-overlay { display: none !important; }
 }
