@@ -10,13 +10,16 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.js";
 // fix: import the actual requests router file (it's named request.js)
 import requestsRoutes from "./routes/request.js";
+import bloodRoutes from "./routes/blood.js";
+
+
 
 dotenv.config();
 console.log("Email user:", process.env.EMAIL_USER ? "Loaded" : "Missing");
 console.log("Email pass:", process.env.EMAIL_PASS ? "Loaded" : "Missing");
 const app = express();
 
-
+app.use("/api", bloodRoutes);
 // Simplified CORS configuration
 app.use(cors({
   origin: "http://localhost:3000", // Your React app

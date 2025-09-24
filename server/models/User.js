@@ -4,17 +4,14 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  phone: { type: String },         
-  profilePic: { type: String },    
-  otp: {
-  type: String,
-},
-otpExpires: {
-  type: Date,
-},
-
+  phone: { type: String },
+  profilePic: { type: String },
+  bloodGroup: { type: String },
+  lastAcceptedDate: { type: Date },
+  acceptedRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "Request" }],
+  otp: { type: String },
+  otpExpires: { type: Date },
 });
-
 
 const User = mongoose.model("User", userSchema);
 export default User;

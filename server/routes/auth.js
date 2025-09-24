@@ -1,33 +1,34 @@
-// server/routes/auth.js
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import Request from "../models/Request.js"; // your blood requests model
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 
 dotenv.config();
-
 const router = express.Router();
 
-// Temporary OTP stores (in-memory; replace with persistent store in production)
+// Temporary OTP stores
 const signupOtpStore = {};
 const loginOtpStore = {};
 
-// Helper: sign JWT and set cookie
-const sendToken = (user, res) => {
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "3d",
-  });
+// Nodemailer setup
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+});
+transporter.verify().then(() => console.log("Nodemailer ready")).catch(console.warn);
 
-  const cookieOptions = {
+// JWT helper
+const sendToken = (user, res) => {
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "3d" });
+  res.cookie("token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
-    maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
-  };
-
-  res.cookie("token", token, cookieOptions);
+    maxAge: 3 * 24 * 60 * 60 * 1000,
+  });
 
   return res.json({
     message: "Auth successful",
@@ -37,244 +38,196 @@ const sendToken = (user, res) => {
       email: user.email,
       phone: user.phone,
       profilePic: user.profilePic,
+      bloodGroup: user.bloodGroup,
+      lastAcceptedDate: user.lastAcceptedDate || null,
+      acceptedRequests: user.acceptedRequests || [],
     },
   });
 };
 
-// Configure nodemailer transporter (Gmail + App Password recommended)
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-
-// optional: verify transporter at startup (logs but doesn't crash)
-transporter.verify().then(() => {
-  console.log("Nodemailer transporter ready");
-}).catch((err) => {
-  console.warn("Nodemailer verify failed:", err.message || err);
-});
-
-// ===== Signup Step 1: request OTP =====
+// ===== Signup request OTP =====
 router.post("/signup-request", async (req, res) => {
   try {
-    const { name, email, password, phone = "", profilePic = "" } = req.body;
-
-    if (!name?.trim() || !email?.trim() || !password?.trim()) {
-      return res.status(400).json({ message: "All fields required" });
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: "Invalid email" });
-    }
+    const { name, email, password, phone = "", profilePic = "", bloodGroup = "" } = req.body;
+    if (!name || !email || !password) return res.status(400).json({ message: "All fields required" });
 
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ message: "User exists" });
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    signupOtpStore[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000, userData: { name, email, password, phone, profilePic, bloodGroup } };
 
-    signupOtpStore[email] = {
-      otp,
-      expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes
-      userData: { name, email, password, phone, profilePic },
-    };
-
-    try {
-      await transporter.sendMail({
-        from: `"BloodBridge" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: "Signup OTP — BloodBridge",
-        text: `Hello ${name},\n\nYour OTP for signup is ${otp}. It expires in 5 minutes.\n\nIf you didn't request this, please ignore this email.`,
-      });
-    } catch (mailErr) {
-      console.error("Failed to send OTP email:", mailErr);
-      // remove stored OTP on failure to avoid stale state
-      delete signupOtpStore[email];
-      return res.status(500).json({ message: "Failed to send OTP. Check email credentials or network." });
-    }
+    await transporter.sendMail({
+      from: `"BloodBridge" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Signup OTP — BloodBridge",
+      text: `Hello ${name},\nYour OTP is ${otp}. Expires in 5 minutes.`,
+    });
 
     return res.json({ success: true, message: "OTP sent" });
   } catch (err) {
-    console.error("Signup request error:", err);
+    console.error(err);
     return res.status(500).json({ message: "Server error" });
   }
 });
 
-// ===== Signup Step 2: verify OTP =====
+// ===== Signup verify OTP =====
 router.post("/signup-verify", async (req, res) => {
   try {
     const { email, otp } = req.body;
     const record = signupOtpStore[email];
-
     if (!record) return res.status(400).json({ message: "No OTP found" });
-    if (record.expiresAt < Date.now()) {
-      delete signupOtpStore[email];
-      return res.status(400).json({ message: "OTP expired" });
-    }
+    if (record.expiresAt < Date.now()) return res.status(400).json({ message: "OTP expired" });
     if (record.otp !== otp) return res.status(400).json({ message: "Invalid OTP" });
 
-    const { name, password, phone, profilePic } = record.userData;
+    const { name, password, phone, profilePic, bloodGroup } = record.userData;
     const hashed = await bcrypt.hash(password, 10);
-    const user = new User({ name, email, password: hashed, phone, profilePic });
+    const user = new User({ name, email, password: hashed, phone, profilePic, bloodGroup });
     await user.save();
-
     delete signupOtpStore[email];
 
     return sendToken(user, res);
   } catch (err) {
-    console.error("Signup verify error:", err);
+    console.error(err);
     return res.status(500).json({ message: "Server error" });
   }
 });
 
-// ===== Login Step 1: request OTP =====
+// ===== Login request OTP =====
 router.post("/login-request", async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ message: "Email and password required" });
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "User not found" });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(400).json({ message: "Invalid credentials" });
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return res.status(400).json({ message: "Invalid password" });
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     loginOtpStore[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 };
 
-    try {
-      await transporter.sendMail({
-        from: `"BloodBridge" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: "Login OTP — BloodBridge",
-        text: `Your login OTP is ${otp}. It expires in 5 minutes.`,
-      });
-    } catch (mailErr) {
-      console.error("Failed to send login OTP:", mailErr);
-      delete loginOtpStore[email];
-      return res.status(500).json({ message: "Failed to send OTP. Check email credentials or network." });
-    }
+    await transporter.sendMail({
+      from: `"BloodBridge" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Login OTP — BloodBridge",
+      text: `Hello ${user.name},\nYour OTP is ${otp}. Expires in 5 minutes.`,
+    });
 
     return res.json({ success: true, message: "OTP sent" });
   } catch (err) {
-    console.error("Login request error:", err);
+    console.error(err);
     return res.status(500).json({ message: "Server error" });
   }
 });
 
-// ===== Login Step 2: verify OTP =====
+// ===== Login verify OTP =====
 router.post("/login-verify", async (req, res) => {
   try {
     const { email, otp } = req.body;
     const record = loginOtpStore[email];
     if (!record) return res.status(400).json({ message: "No OTP found" });
-    if (record.expiresAt < Date.now()) {
-      delete loginOtpStore[email];
-      return res.status(400).json({ message: "OTP expired" });
-    }
+    if (record.expiresAt < Date.now()) return res.status(400).json({ message: "OTP expired" });
     if (record.otp !== otp) return res.status(400).json({ message: "Invalid OTP" });
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "User not found" });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     delete loginOtpStore[email];
+
     return sendToken(user, res);
   } catch (err) {
-    console.error("Login verify error:", err);
+    console.error(err);
     return res.status(500).json({ message: "Server error" });
   }
 });
 
-// Middleware to check JWT in cookie
+// ===== Middleware =====
 const requireAuth = async (req, res, next) => {
   try {
     const token = req.cookies?.token;
     if (!token) return res.status(401).json({ message: "Not authenticated" });
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select("-password");
+    const user = await User.findById(decoded.id).populate("acceptedRequests");
     if (!user) return res.status(401).json({ message: "User not found" });
-
     req.user = user;
     next();
   } catch (err) {
-    console.error("Auth middleware error:", err);
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 };
 
 // ===== Get current user =====
-router.get("/me", requireAuth, (req, res) => {
-  res.json({ user: req.user });
-});
+router.get("/me", requireAuth, (req, res) => res.json({ user: req.user }));
 
-// ===== Update current user =====
+// ===== Update user =====
 router.put("/me", requireAuth, async (req, res) => {
   try {
-    const { name, phone, profilePic } = req.body;
+    const { name, phone, profilePic, bloodGroup } = req.body;
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
     user.name = name ?? user.name;
     user.phone = phone ?? user.phone;
     user.profilePic = profilePic ?? user.profilePic;
+    user.bloodGroup = bloodGroup ?? user.bloodGroup;
 
     await user.save();
-    const safeUser = await User.findById(user._id).select("-password");
+    const safeUser = await User.findById(user._id).select("-password").populate("acceptedRequests");
     return res.json({ user: safeUser });
   } catch (err) {
-    console.error("Update profile error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });
 
-// ===== Logout =====
-router.post("/logout", (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
-  });
-  res.json({ message: "Logged out successfully" });
+// ===== Get accepted requests =====
+router.get("/me/accepted-requests", requireAuth, async (req, res) => {
+  try {
+    return res.json({ acceptedRequests: req.user.acceptedRequests });
+  } catch (err) {
+    return res.status(500).json({ message: "Server error" });
+  }
 });
 
-// ===== Profile routes (by id) =====
+// ===== Profile by ID =====
 router.get("/profile/:id", requireAuth, async (req, res) => {
   try {
-    const { id } = req.params;
-    const user = await User.findById(id).select("-password");
+    const user = await User.findById(req.params.id).select("-password").populate("acceptedRequests");
     if (!user) return res.status(404).json({ message: "User not found" });
     return res.json(user);
   } catch (err) {
-    console.error("GET /profile/:id error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });
 
-router.put("/profile/:id", requireAuth, async (req, res) => {
+// ===== Accept blood request =====
+router.post("/requests/:id/accept", requireAuth, async (req, res) => {
   try {
-    const { id } = req.params;
-    // only allow owner to update their profile
-    if (req.user._id.toString() !== id) {
-      return res.status(403).json({ message: "Forbidden" });
+    const request = await Request.findById(req.params.id);
+    if (!request) return res.status(404).json({ message: "Request not found" });
+
+    // check blood type
+    if (req.user.bloodGroup !== request.bloodType)
+      return res.status(400).json({ message: "Your blood type does not match the request" });
+
+    // check 3 months rule
+    if (req.user.lastAcceptedDate) {
+      const last = new Date(req.user.lastAcceptedDate);
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+      if (last > threeMonthsAgo)
+        return res.status(400).json({ message: "You must wait 3 months between donations" });
     }
 
-    const { name, phone, profilePic } = req.body;
-    const user = await User.findById(id);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    // add to user's accepted requests
+    req.user.acceptedRequests.push(request._id);
+    req.user.lastAcceptedDate = new Date();
+    await req.user.save();
 
-    if (name !== undefined) user.name = name;
-    if (phone !== undefined) user.phone = phone;
-    if (profilePic !== undefined) user.profilePic = profilePic;
-
-    await user.save();
-    const safeUser = await User.findById(id).select("-password");
-    return res.json(safeUser);
+    return res.json({ message: "Request accepted successfully" });
   } catch (err) {
-    console.error("PUT /profile/:id error:", err);
+    console.error(err);
     return res.status(500).json({ message: "Server error" });
   }
 });
