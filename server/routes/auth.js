@@ -2,7 +2,7 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import Request from "../models/Request.js"; // your blood requests model
+import Request from "../models/Request.js"; // Blood requests model
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 
@@ -18,11 +18,15 @@ const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
 });
-transporter.verify().then(() => console.log("Nodemailer ready")).catch(console.warn);
+transporter.verify()
+  .then(() => console.log("Nodemailer ready"))
+  .catch(console.warn);
 
 // JWT helper
 const sendToken = (user, res) => {
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "3d" });
+  const payload = { id: user._id, v: user.tokenVersion ?? 0 };
+  const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "3d" });
+
   res.cookie("token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -49,13 +53,18 @@ const sendToken = (user, res) => {
 router.post("/signup-request", async (req, res) => {
   try {
     const { name, email, password, phone = "", profilePic = "", bloodGroup = "" } = req.body;
-    if (!name || !email || !password) return res.status(400).json({ message: "All fields required" });
+    if (!name || !email || !password)
+      return res.status(400).json({ message: "All fields required" });
 
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ message: "User exists" });
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    signupOtpStore[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000, userData: { name, email, password, phone, profilePic, bloodGroup } };
+    signupOtpStore[email] = {
+      otp,
+      expiresAt: Date.now() + 5 * 60 * 1000,
+      userData: { name, email, password, phone, profilePic, bloodGroup },
+    };
 
     await transporter.sendMail({
       from: `"BloodBridge" <${process.env.EMAIL_USER}>`,
@@ -97,7 +106,8 @@ router.post("/signup-verify", async (req, res) => {
 router.post("/login-request", async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ message: "Email and password required" });
+    if (!email || !password)
+      return res.status(400).json({ message: "Email and password required" });
 
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -148,9 +158,21 @@ const requireAuth = async (req, res, next) => {
   try {
     const token = req.cookies?.token;
     if (!token) return res.status(401).json({ message: "Not authenticated" });
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      console.error("JWT verify failed:", err);
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+
     const user = await User.findById(decoded.id).populate("acceptedRequests");
     if (!user) return res.status(401).json({ message: "User not found" });
+
+    if (typeof decoded.v !== "undefined" && decoded.v !== (user.tokenVersion ?? 0))
+      return res.status(401).json({ message: "Token revoked" });
+
     req.user = user;
     next();
   } catch (err) {
@@ -181,37 +203,15 @@ router.put("/me", requireAuth, async (req, res) => {
   }
 });
 
-// ===== Get accepted requests =====
-router.get("/me/accepted-requests", requireAuth, async (req, res) => {
-  try {
-    return res.json({ acceptedRequests: req.user.acceptedRequests });
-  } catch (err) {
-    return res.status(500).json({ message: "Server error" });
-  }
-});
-
-// ===== Profile by ID =====
-router.get("/profile/:id", requireAuth, async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id).select("-password").populate("acceptedRequests");
-    if (!user) return res.status(404).json({ message: "User not found" });
-    return res.json(user);
-  } catch (err) {
-    return res.status(500).json({ message: "Server error" });
-  }
-});
-
 // ===== Accept blood request =====
 router.post("/requests/:id/accept", requireAuth, async (req, res) => {
   try {
     const request = await Request.findById(req.params.id);
     if (!request) return res.status(404).json({ message: "Request not found" });
 
-    // check blood type
     if (req.user.bloodGroup !== request.bloodType)
       return res.status(400).json({ message: "Your blood type does not match the request" });
 
-    // check 3 months rule
     if (req.user.lastAcceptedDate) {
       const last = new Date(req.user.lastAcceptedDate);
       const threeMonthsAgo = new Date();
@@ -220,7 +220,6 @@ router.post("/requests/:id/accept", requireAuth, async (req, res) => {
         return res.status(400).json({ message: "You must wait 3 months between donations" });
     }
 
-    // add to user's accepted requests
     req.user.acceptedRequests.push(request._id);
     req.user.lastAcceptedDate = new Date();
     await req.user.save();
@@ -228,6 +227,28 @@ router.post("/requests/:id/accept", requireAuth, async (req, res) => {
     return res.json({ message: "Request accepted successfully" });
   } catch (err) {
     console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ===== Revoke JWTs =====
+router.post("/revoke", requireAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.tokenVersion = (user.tokenVersion ?? 0) + 1;
+    await user.save();
+
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+    });
+
+    return res.json({ success: true, message: "Tokens revoked for this account" });
+  } catch (err) {
+    console.error("Revoke error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });

@@ -3,7 +3,6 @@ import User from "../models/User.js";
 
 export const authMiddleware = async (req, res, next) => {
   try {
-    // read token from cookie first, fallback to Authorization header
     const cookieToken = req.cookies?.token;
     const headerToken =
       req.headers?.authorization?.startsWith("Bearer ")
@@ -25,6 +24,11 @@ export const authMiddleware = async (req, res, next) => {
     const user = await User.findById(decoded.id).select("-password");
     if (!user) {
       return res.status(401).json({ message: "User not found" });
+    }
+
+    // If token contains a version, ensure it matches the user's current tokenVersion
+    if (typeof decoded.v !== "undefined" && decoded.v !== (user.tokenVersion ?? 0)) {
+      return res.status(401).json({ message: "Token revoked" });
     }
 
     req.user = user;

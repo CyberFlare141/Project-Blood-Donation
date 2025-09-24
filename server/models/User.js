@@ -11,6 +11,9 @@ const userSchema = new mongoose.Schema({
   acceptedRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "Request" }],
   otp: { type: String },
   otpExpires: { type: Date },
+
+  // tokenVersion allows server-side revocation of JWTs
+  tokenVersion: { type: Number, default: 0 },
 });
 
 const User = mongoose.model("User", userSchema);
