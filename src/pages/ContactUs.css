@@ -104,13 +104,13 @@
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 .contact-map-link {
-  text-decoration: none; /* remove underline */
-  color: inherit;        /* keep text color same */
-  display: block;        /* make whole box clickable */
+  text-decoration: none; 
+  color: inherit;        
+  display: block;        
 }
 
 .contact-map:hover {
-  background: #f8f8f8; /* slight hover feedback */
+  background: #f8f8f8; 
   cursor: pointer;
 }
 
@@ -123,10 +123,20 @@
   color: #555;
 }
 
-/* Responsive */
-@media (max-width: 600px) {
-  .contact-card,
-  .contact-map {
-    padding: 20px;
-  }
+.contact-card { width: 100%; max-width: 900px; box-sizing: border-box; }
+
+.contact-form button, .contact-form input, .contact-form textarea {
+  box-sizing: border-box;
+}
+.contact-form button[type="button"] { margin-top: 6px; }
+
+.contact-map { height: auto; min-height: 160px; padding: 18px; }
+
+@media (max-width: 680px) {
+  .contact-card { padding: 20px; }
+  .contact-header { padding: 28px 12px; }
+  .contact-map { height: 180px; }
+  .contact-form button, .contact-form input, .contact-form textarea { font-size: 15px; }
+  .contact-form button { width: 100%; }
+  .contact-form input, .contact-form textarea { padding: 10px; }
 }
