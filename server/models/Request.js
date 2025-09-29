@@ -9,10 +9,10 @@ const requestSchema = new mongoose.Schema({
   emergency: { type: Boolean, default: false },
   date: { type: Date, default: Date.now },
   time: { type: String },
-  unitsRequested: { type: Number, required: true, default: 1 }, // added
+  unitsRequested: { type: Number, required: true, default: 1 },
   createdAt: { type: Date, default: Date.now },
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // owner
-  acceptedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // accepted by
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  acceptedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 });
 
 const Request = mongoose.model("Request", requestSchema);

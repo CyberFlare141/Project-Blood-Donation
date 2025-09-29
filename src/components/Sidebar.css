@@ -1,15 +1,15 @@
 
 /* Sidebar container */
 .sidebar {
-  background: #ffe6e6; /* soft pink background */
-  width: 200px; /* slightly wider to fit long names */
+  background: #ffe6e6;
+  width: 200px;
   min-height: 100vh;
   padding: 12px;
   display: flex;
   flex-direction: column;
   transition: width 0.3s;
-  border-right: none; /* removed white/gray border */
-  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05); /* subtle shadow instead */
+  border-right: none; 
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05);
 }
 
 .sidebar.collapsed {
@@ -18,7 +18,7 @@
 
 /* Toggle button */
 .toggle-btn {
-  background: #ffb3b3; /* light red */
+  background: #ffb3b3; 
   border: none;
   padding: 8px;
   border-radius: 6px;
@@ -42,7 +42,7 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  border: 2px solid #ff9999; /* red border */
+  border: 2px solid #ff9999; 
 }
 
 .name {
@@ -67,12 +67,12 @@
   padding: 12px 10px;
   border-radius: 6px;
   text-decoration: none;
-  color: #a50000; /* dark red text */
+  color: #a50000;
   transition: all 0.2s;
   gap: 10px;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap; /* keep on one line */
+  white-space: nowrap;
 }
 
 .nav-link:hover {
@@ -81,7 +81,7 @@
 }
 
 .nav-link.active {
-  background: #ff4d4d; /* deep red */
+  background: #ff4d4d;
   color: white;
 }
 
@@ -107,7 +107,7 @@
   padding: 12px 10px;
   border-radius: 6px;
   border: none;
-  background: #ff4d4d; /* strong red */
+  background: #ff4d4d;
   color: white;
   cursor: pointer;
   transition: all 0.2s;

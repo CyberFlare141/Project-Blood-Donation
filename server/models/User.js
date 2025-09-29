@@ -12,7 +12,6 @@ const userSchema = new mongoose.Schema({
   otp: { type: String },
   otpExpires: { type: Date },
 
-  // tokenVersion allows server-side revocation of JWTs
   tokenVersion: { type: Number, default: 0 },
 });
 

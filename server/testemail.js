@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 
-dotenv.config(); // Load .env variables
+dotenv.config(); 
 
 async function main() {
   try {
@@ -15,7 +15,7 @@ async function main() {
 
     const info = await transporter.sendMail({
       from: `"Test" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_USER, // send email to yourself
+      to: process.env.EMAIL_USER,
       subject: "Test Email from MyApp",
       text: "Hello! This is a test email to check the OTP system.",
     });

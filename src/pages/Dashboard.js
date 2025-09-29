@@ -14,7 +14,7 @@ export default function Dashboard() {
   const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState("desc");
 
-  // Fetch user & accepted requests
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -29,7 +29,6 @@ export default function Dashboard() {
     fetchUser();
   }, [API_BASE]);
 
-  // Fetch all requests
   useEffect(() => {
     const fetchRequests = async () => {
       try {
@@ -49,14 +48,12 @@ export default function Dashboard() {
     fetchRequests();
   }, [API_BASE]);
 
-  // Separate accepted vs pending
   useEffect(() => {
     if (!user) return;
     const acceptedIds = new Set(acceptedRequests.map(r => r._id));
     setPendingRequests(requests.filter(r => !acceptedIds.has(r._id)));
   }, [requests, acceptedRequests, user]);
 
-  // Accept request
   const handleAccept = async (req) => {
     try {
       const res = await fetch(`${API_BASE}/api/requests/${req._id}/accept`, {
@@ -76,7 +73,6 @@ export default function Dashboard() {
     }
   };
 
-  // Can accept check
   const canAccept = (req) => {
     if (!user) return { ok: false, reason: "Login required" };
     if (acceptedRequests.find(r => r._id === req._id)) return { ok: false, reason: "Already accepted" };
@@ -93,7 +89,6 @@ export default function Dashboard() {
   const formatDate = d =>
     d ? new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) : "-";
 
-  // Sorting
   const sortedPending = useMemo(() => {
     const arr = [...pendingRequests];
     const order = sortOrder === "asc" ? 1 : -1;

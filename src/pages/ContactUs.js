@@ -7,7 +7,6 @@ function ContactUs() {
   const [location, setLocation] = useState("");
   const [status, setStatus] = useState("");
 
-  // Get user coordinates
   const getLocation = () => {
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser");
@@ -29,8 +28,8 @@ function ContactUs() {
 
     emailjs
       .send(
-        "service_7i32r3l",      // your service ID
-        "template_fmoo1lz",     // your template ID
+        "service_7i32r3l",     
+        "template_fmoo1lz",  
         {
           name: formData.name,
           email: formData.email,
@@ -39,7 +38,7 @@ function ContactUs() {
             ? `https://maps.google.com/?q=${location}`
             : "No location provided",
         },
-        "FGwbanEmhiglULNzk"    // your public key
+        "FGwbanEmhiglULNzk"
       )
       .then(
         () => {
@@ -52,20 +51,19 @@ function ContactUs() {
   };
 
   return (
+    
     <div className="contact-container">
-      {/* Header */}
+      
       <div className="contact-header">
         <h1>Contact Us</h1>
         <p>We'd love to hear from you! Reach out with questions, feedback, or partnership inquiries.</p>
       </div>
 
-      {/* Get in Touch Section */}
       <div className="get-in-touch">
         <div className="contact-card">
           <h2>Get in Touch</h2>
           <p>Please fill out the form below and optionally share your location.</p>
 
-          {/* Contact Form */}
           <form className="contact-form" onSubmit={handleSubmit}>
             <input
               type="text"
@@ -113,8 +111,6 @@ function ContactUs() {
           {status && <p className="status">{status}</p>}
         </div>
       </div>
-
-      {/* Map Section */}
       <div className="map-section">
         <a
           href={location ? `https://maps.google.com/?q=${location}` : "#"}
@@ -128,7 +124,6 @@ function ContactUs() {
         </a>
       </div>
 
-      {/* Footer */}
       <footer className="contact-footer">
         © 2024 Be a Hero – Blood Donation. All rights reserved.
       </footer>

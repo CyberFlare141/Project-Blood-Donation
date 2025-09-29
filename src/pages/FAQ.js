@@ -1,3 +1,4 @@
+//import Navbar from "../components/Navbar";
 
 import React from "react";
 import { Accordion, Container, Row, Col } from "react-bootstrap";
@@ -15,6 +16,8 @@ const faqs = [
 
 const FAQ = () => {
   return (
+    <>
+   
     <div className="faq-page">
       <div className="faq-header">
         <h1>Frequently Asked Questions</h1>
@@ -39,6 +42,7 @@ const FAQ = () => {
         © 2024 Be a Hero – Blood Donation. All rights reserved.
       </footer>
     </div>
+    </>
   );
 };
 

@@ -1,4 +1,3 @@
-// server/models/Blood.js
 import mongoose from "mongoose";
 
 const bloodSchema = new mongoose.Schema({

@@ -5,14 +5,14 @@ import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Create request
 router.post("/", authMiddleware, async (req, res) => {
   try {
     const payload = { 
       ...req.body, 
       user: req.user._id, 
       createdAt: req.body.createdAt || new Date(),
-      unitsRequested: req.body.unitsRequested || 1 // default to 1 unit
+      unitsRequested: req.body.unitsRequested || 1
+
     };
     const request = new Request(payload);
     await request.save();
@@ -23,7 +23,6 @@ router.post("/", authMiddleware, async (req, res) => {
   }
 });
 
-// List all requests
 router.get("/", async (req, res) => {
   try {
     const requests = await Request.find().sort({ createdAt: -1 });
@@ -97,7 +96,7 @@ router.post("/:id/accept", authMiddleware, async (req, res) => {
   }
 });
 
-// Inventory summary: total units per blood type
+
 router.get("/inventory", async (req, res) => {
   try {
     const requests = await Request.find();
