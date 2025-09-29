@@ -11,7 +11,8 @@ import { AuthProvider } from './context/AuthContext';
 import Layout from './components/Layout';
 import BloodRequestForm from './pages/BloodRequestForm';
 import Dashboard from './pages/Dashboard';
-import PrivateRoute from './components/PrivateRoute';  // ✅ new
+import PrivateRoute from './components/PrivateRoute';
+import CarbonFootprintDisplay from './components/CarbonFootprintDisplay';
 
 function App() {
   return (
@@ -36,6 +37,9 @@ function App() {
             <Route path="/contactus" element={<ContactUs />} />
             <Route path="/faq" element={<FAQ />} />
           </Routes>
+
+          {/* show footprint widget for the session */}
+          <CarbonFootprintDisplay />
         </Layout>
       </Router>
     </AuthProvider>

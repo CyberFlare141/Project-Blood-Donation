@@ -1,11 +1,11 @@
-/* ======== Global Reset ======== */
+
 html, body, #root {
   margin: 0;
   padding: 0;
   width: 100%;
   overflow-x: hidden;
   box-sizing: border-box;
-  background-color: #e63946; /* match your main color */
+  background-color: #e63946; 
 }
 
 *,
@@ -16,19 +16,18 @@ html, body, #root {
 
 /* ======== Sidebar Fix ======== */
 .sidebar {
-  width: 240px; /* adjust as needed */
+  width: 240px; 
 }
 
 .sidebar a {
   display: block;
   padding: 12px 16px;
-  white-space: normal;       /* allow wrapping */
-  word-break: break-word;    /* break long words */
+  white-space: normal;   
+  word-break: break-word;  
   text-decoration: none;
   color: inherit;
 }
 
-/* ======== Home page container ======== */
 .home-page {
   background: #e63946;
   margin: 0;
@@ -57,10 +56,9 @@ html, body, #root {
   margin: 0;
   padding: 3rem 0;
   box-sizing: border-box;
-  position: static; /* removed forced centering */
+  position: static; 
 }
 
-/* ======== Hero Section ======== */
 .hero-section {
   background-color: #ffb3b3;
   display: flex;
@@ -134,7 +132,7 @@ html, body, #root {
   color: white;
 }
 
-/* ======== Quick Actions Section ======== */
+
 .quick-actions-section {
   background-color: #ffb3b3;
 }
@@ -176,7 +174,7 @@ html, body, #root {
   text-decoration: underline;
 }
 
-/* ======== Blood Inventory Section ======== */
+
 .inventory-section {
   background-color: #ffd6d6;
 }
@@ -244,7 +242,6 @@ html, body, #root {
   display: block;
 }
 
-/* Badge styles */
 .badge-pill {
   display: inline-block;
   padding: 0.25rem 0.75rem;
@@ -284,7 +281,6 @@ html, body, #root {
   color: white;
 }
 
-/* ======== Eligibility Section ======== */
 .eligibility-section {
   background-color: #ffb3b3;
 }
@@ -347,11 +343,10 @@ html, body, #root {
   color: #2a9d8f;
 }
 
-.eligibility-result.warning h3 {
+.eligibility.result.warning h3 {
   color: #e63946;
 }
 
-/* ======== Stats Section ======== */
 .stats-section {
   background-color: #ffd6d6;
 }
@@ -383,7 +378,6 @@ html, body, #root {
   margin-top: 0.5rem;
 }
 
-/* ======== Form container styles ======== */
 .form-container {
   max-width: 450px;
   margin: 50px auto;
@@ -420,7 +414,6 @@ form button:hover {
   background: #8a1212;
 }
 
-/* ======== Responsive adjustments ======== */
 @media (max-width: 768px) {
   .hero-section {
     flex-direction: column;
@@ -447,8 +440,7 @@ form button:hover {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
-  /* Form container adjustments for mobile */
+
   .form-container {
     max-width: 90%;
     margin: 30px auto;
@@ -456,35 +448,116 @@ form button:hover {
   }
 }
 
+
+.container { padding-left: 1rem; padding-right: 1rem; box-sizing: border-box; }
+
+.hero-visual, .blood-drop-icon, .profile-avatar, img { max-width: 100%; height: auto; }
+
+.eligibility-buttons button {
+  min-width: 140px;
+  padding: 0.6rem 1rem;
+  border-radius: 50px;
+}
 @media (max-width: 480px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
+  .eligibility-buttons { flex-direction: column; gap: 0.6rem; align-items: stretch; }
+  .eligibility-buttons button { width: 100%; min-width: 0; }
+  .hero-section { padding: 1.5rem 0; }
+  .hero-content, .hero-visual { padding: 0.8rem; }
+}
+
+.level-fill { min-width: 6px; }
+
+.badge-pill { word-break: keep-all; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0.25rem 0.6rem; }
+
+@media (max-width: 360px) {
+  .blood-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
+  .action-cards { gap: 1rem; }
+}
+
+/* Navbar */
+.navbar {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background-color: #b71c1c;
+  color: #fff;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 2rem;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+}
+
+.navbar-links li a,
+.navbar-links li button {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.navbar-links li button.logout-btn:hover,
+.navbar-links li a:hover {
+  text-decoration: underline;
+}
+
+/* Hamburger menu */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+.bar {
+  height: 3px;
+  width: 25px;
+  background-color: #fff;
+  margin: 4px 0;
+  border-radius: 2px;
+}
+
+
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex;
   }
-  
-  .blood-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .hero-buttons {
+
+  .navbar-links {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background-color: #b71c1c;
     flex-direction: column;
-    align-items: center;
+    width: 200px;
+    display: none;
+    padding: 1rem;
+    border-radius: 0 0 0 10px;
   }
-  
-  .cta-button {
-    width: 100%;
-    max-width: 250px;
-    margin-bottom: 0.5rem;
+
+  .navbar-links.active {
+    display: flex;
   }
-  
-  /* Form container adjustments for small mobile */
-  .form-container {
-    max-width: 95%;
-    margin: 20px auto;
-    padding: 15px;
-  }
-  
-  form input, form select, form button {
-    padding: 10px;
-    font-size: 14px;
+
+  .navbar-links li {
+    margin: 0.8rem 0;
   }
 }

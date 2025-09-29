@@ -24,12 +24,17 @@
 .faq-container {
   margin-top: -30px;
   margin-bottom: 50px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  box-sizing: border-box;
 }
 
 .faq-title {
   margin-bottom: 20px;
   font-weight: 600;
   color: #d32f2f;
+  font-size: 18px;
 }
 
 .faq-footer {
@@ -38,4 +43,19 @@
   font-size: 14px;
   color: #888;
   margin-top: auto;
+}
+
+@media (max-width: 700px) {
+  .faq-header {
+    padding: 32px 12px;
+  }
+  .faq-container {
+    margin-top: -20px;
+  }
+  .faq-title {
+    font-size: 18px;
+  }
+  .faq-footer {
+    padding: 18px 12px;
+  }
 }

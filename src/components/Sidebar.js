@@ -46,7 +46,7 @@ function Sidebar() {
           {!collapsed && <span className="nav-text">Home</span>}
         </Link>
 
-        {/* Profile link: always shown */}
+       
         <Link
           to="/profile"
           className={location.pathname === "/profile" ? "nav-link active" : "nav-link"}
@@ -87,7 +87,7 @@ function Sidebar() {
           {!collapsed && <span className="nav-text">FAQ</span>}
         </Link>
 
-        {/* Blood Request link: always shown */}
+        
         <Link
           to="/BloodRequestForm"
           className={location.pathname === "/BloodRequestForm" ? "nav-link active" : "nav-link"}
@@ -96,7 +96,6 @@ function Sidebar() {
           {!collapsed && <span className="nav-text">Blood Request Form</span>}
         </Link>
 
-        {/* Logout button only if logged in */}
         {user && (
           <button className="logout-btn" onClick={handleLogout}>
             <span className="nav-icon">⏻</span>

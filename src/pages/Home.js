@@ -1,8 +1,14 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import "./Home.css";
 
+const allBloodTypes = ["O-", "O+", "A-", "A+", "B-", "B+", "AB-", "AB+"];
+
 function Home() {
+  const { API_BASE } = useAuth();
+  const [bloodNeeded, setBloodNeeded] = useState({});
+  const [loading, setLoading] = useState(true);
+
   const [eligibilityAnswers, setEligibilityAnswers] = useState({
     age: null,
     vaccine: null,
@@ -10,18 +16,6 @@ function Home() {
   });
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [showFinalResult, setShowFinalResult] = useState(false);
-
-  // Sample blood inventory data
-  const bloodInventory = [
-    { type: "O-", units: 2 },
-    { type: "O+", units: 6 },
-    { type: "A-", units: 4 },
-    { type: "A+", units: 8 },
-    { type: "B-", units: 1 },
-    { type: "B+", units: 7 },
-    { type: "AB-", units: 3 },
-    { type: "AB+", units: 5 }
-  ];
 
   const questions = [
     {
@@ -38,26 +32,43 @@ function Home() {
     },
     {
       id: 'disease',
-      text: 'Do you have any chronic diseases (like HIV, Hepatitis B/C, heart conditions, etc.) that might prevent donation?',
-      yesText: 'For your safety and the safety of recipients, certain medical conditions may prevent blood donation.',
+      text: 'Do you have any chronic diseases that might prevent donation?',
+      yesText: 'Certain medical conditions may prevent blood donation.',
       noText: 'Excellent! Being in good health is important for blood donation.'
     }
   ];
 
-  const handleAnswer = (answer) => {
-    const updatedAnswers = {
-      ...eligibilityAnswers,
-      [questions[currentQuestion].id]: answer
+  // Fetch current blood requests
+  useEffect(() => {
+    const fetchNeeded = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${API_BASE}/api/requests/inventory`);
+        const data = await res.json();
+
+        const needed = {};
+        allBloodTypes.forEach(type => {
+          needed[type] = data[type] || 0; 
+        });
+
+        setBloodNeeded(needed);
+      } catch (err) {
+        console.error("Failed to fetch blood requests:", err);
+      } finally {
+        setLoading(false);
+      }
     };
-    
-    setEligibilityAnswers(updatedAnswers);
-    
+    fetchNeeded();
+  }, [API_BASE]);
+
+  const handleAnswer = (answer) => {
+    const updated = { ...eligibilityAnswers, [questions[currentQuestion].id]: answer };
+    setEligibilityAnswers(updated);
+
     if (currentQuestion === questions.length - 1) {
       setShowFinalResult(true);
     } else {
-      setTimeout(() => {
-        setCurrentQuestion(currentQuestion + 1);
-      }, 800);
+      setTimeout(() => setCurrentQuestion(currentQuestion + 1), 600);
     }
   };
 
@@ -67,15 +78,15 @@ function Home() {
     setShowFinalResult(false);
   };
 
-  const allQuestionsAnswered = Object.values(eligibilityAnswers).every(answer => answer !== null);
-  const isEligible = allQuestionsAnswered && 
-                     eligibilityAnswers.age === 'yes' && 
-                     eligibilityAnswers.vaccine === 'no' && 
+  const allAnswered = Object.values(eligibilityAnswers).every(a => a !== null);
+  const isEligible = allAnswered &&
+                     eligibilityAnswers.age === 'yes' &&
+                     eligibilityAnswers.vaccine === 'no' &&
                      eligibilityAnswers.disease === 'no';
 
   const getBloodStatus = (units) => {
-    if (units <= 2) return "urgent";
-    if (units <= 5) return "low";
+    if (units >= 5) return "urgent";
+    if (units >= 3) return "low";
     return "moderate";
   };
 
@@ -86,113 +97,60 @@ function Home() {
 
   return (
     <div className="home-page">
-      {/* Hero Section */}
+
       <section className="hero-section">
         <div className="hero-content">
           <div className="badge-pill">Life Saver</div>
           <h1>Donate Blood, Save Lives</h1>
           <p>Join thousands of heroes who give the gift of life. Your donation can save up to 3 lives.</p>
-          <div className="hero-buttons">
-            <Link to="/BloodRequestForm" className="cta-button primary">Request Blood</Link>
-            <Link to="/dashboard" className="cta-button secondary">View Requests</Link>
-          </div>
         </div>
         <div className="hero-visual">
           <div className="blood-drop-icon">🩸</div>
         </div>
       </section>
 
-      {/* Blood Inventory Section */}
       <section className="inventory-section">
         <div className="container">
-          <h2>Current Blood Inventory</h2>
-          <p className="section-subtitle">Your donation can help replenish our critical supply</p>
-          
-          <div className="blood-grid">
-            {bloodInventory.map((blood, index) => {
-              const status = getBloodStatus(blood.units);
-              const percentage = getPercentage(blood.units);
-              const statusLabels = {
-                urgent: "Urgent",
-                low: "Low",
-                moderate: "Moderate"
-              };
-              
-              return (
-                <div key={index} className={`blood-type ${status}`}>
-                  <div className={`badge-pill ${status}-badge`}>{statusLabels[status]}</div>
-                  <h3>{blood.type}</h3>
-                  <div className="blood-level">
-                    <div className="level-bar">
-                      <div 
-                        className="level-fill" 
-                        style={{width: `${percentage}%`}}
-                      ></div>
+          <h2>Current Blood Needed</h2>
+          {loading ? <p>Loading...</p> : (
+            <div className="blood-grid">
+              {Object.entries(bloodNeeded).map(([type, units], idx) => {
+                const status = getBloodStatus(units);
+                const percentage = getPercentage(units);
+                const statusLabels = { urgent: "Urgent", low: "Low", moderate: "Moderate" };
+                return (
+                  <div key={idx} className={`blood-type ${status}`}>
+                    <div className={`badge-pill ${status}-badge`}>{statusLabels[status]}</div>
+                    <h3>{type}</h3>
+                    <div className="blood-level">
+                      <div className="level-bar">
+                        <div className="level-fill" style={{ width: `${percentage}%` }}></div>
+                      </div>
+                      <span className="level-text">{units} units needed</span>
                     </div>
-                    <span className="level-text">
-                      {status === "urgent" ? `Critical: ${blood.units} units` : `${blood.units} units`}
-                    </span>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Quick Action Section */}
-      <section className="quick-actions-section">
-        <div className="container">
-          <h2>Quick Actions</h2>
-          <p className="section-subtitle">Get involved and make a difference</p>
-          
-          <div className="action-cards">
-            <div className="action-card">
-              <div className="action-icon">🩸</div>
-              <h3>Request Blood</h3>
-              <p>Submit a request for blood donation for a patient in need.</p>
-              <Link to="/BloodRequestForm" className="action-link">Make a Request →</Link>
-            </div>
-            
-            <div className="action-card">
-              <div className="action-icon">📊</div>
-              <h3>View Requests</h3>
-              <p>See all current blood requests and find opportunities to help.</p>
-              <Link to="/dashboard" className="action-link">View Dashboard →</Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Eligibility Checker */}
       <section className="eligibility-section">
         <div className="container">
           <h2>Eligibility Checker</h2>
-          <p className="section-subtitle">Quick check to see if you can donate today</p>
-          
           <div className="eligibility-card">
             {!showFinalResult ? (
               <>
                 <div className="badge-pill info-badge">Question {currentQuestion + 1} of {questions.length}</div>
                 <h3>{questions[currentQuestion].text}</h3>
                 <div className="eligibility-buttons">
-                  <button 
-                    className={`answer-btn pill-btn ${eligibilityAnswers[questions[currentQuestion].id] === 'yes' ? 'selected' : ''}`}
-                    onClick={() => handleAnswer('yes')}
-                  >
-                    Yes
-                  </button>
-                  <button 
-                    className={`answer-btn pill-btn ${eligibilityAnswers[questions[currentQuestion].id] === 'no' ? 'selected' : ''}`}
-                    onClick={() => handleAnswer('no')}
-                  >
-                    No
-                  </button>
+                  <button onClick={() => handleAnswer('yes')}>Yes</button>
+                  <button onClick={() => handleAnswer('no')}>No</button>
                 </div>
-                
                 {eligibilityAnswers[questions[currentQuestion].id] && (
                   <div className="eligibility-feedback">
-                    <p className={eligibilityAnswers[questions[currentQuestion].id] === 'yes' ? 'not-eligible' : 'eligible'}>
+                    <p>
                       {eligibilityAnswers[questions[currentQuestion].id] === 'yes' 
                         ? questions[currentQuestion].yesText 
                         : questions[currentQuestion].noText}
@@ -206,18 +164,12 @@ function Home() {
                 {isEligible ? (
                   <div className="eligibility-result success">
                     <h3>You may be eligible to donate!</h3>
-                    <p>Based on your answers, you meet the basic criteria for blood donation.</p>
-                    <button className="cta-button primary" onClick={resetEligibilityCheck}>
-                      Start Over
-                    </button>
+                    <button onClick={resetEligibilityCheck}>Start Over</button>
                   </div>
                 ) : (
                   <div className="eligibility-result warning">
                     <h3>You may not be eligible to donate at this time</h3>
-                    <p>Based on your answers, there may be some restrictions. Please consult with our medical staff for more information.</p>
-                    <button className="cta-button secondary" onClick={resetEligibilityCheck}>
-                      Try Again
-                    </button>
+                    <button onClick={resetEligibilityCheck}>Try Again</button>
                   </div>
                 )}
               </div>
@@ -226,31 +178,13 @@ function Home() {
         </div>
       </section>
 
-      {/* Stats Section */}
       <section className="stats-section">
         <div className="container">
           <div className="badge-pill light-badge">Our Impact</div>
           <div className="stats-grid">
-            <div className="stat">
-              <h3>5,000+</h3>
-              <p>Lives Saved</p>
-              <span className="badge-pill neutral-badge">Since 2020</span>
-            </div>
-            <div className="stat">
-              <h3>2,400+</h3>
-              <p>Active Donors</p>
-              <span className="badge-pill neutral-badge">Community</span>
-            </div>
-            <div className="stat">
-              <h3>12</h3>
-              <p>Donation Centers</p>
-              <span className="badge-pill neutral-badge">Nationwide</span>
-            </div>
-            <div className="stat">
-              <h3>1</h3>
-              <p>Donation Can Save 3 Lives</p>
-              <span className="badge-pill neutral-badge">Multiply Impact</span>
-            </div>
+            <div className="stat"><h3>5,000+</h3><p>Lives Saved</p></div>
+            <div className="stat"><h3>2,400+</h3><p>Active Donors</p></div>
+            <div className="stat"><h3>12</h3><p>Donation Centers</p></div>
           </div>
         </div>
       </section>

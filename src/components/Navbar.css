@@ -1,0 +1,129 @@
+/* Navbar Container */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(90deg, #e53935, #f44336);
+  padding: 0.5rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Logo */
+.navbar-left .navbar-logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+}
+
+/* Right side links */
+.navbar-right {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+/* All links */
+.navbar-right a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
+}
+
+.navbar-right a:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Buttons */
+.nav-btn {
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.login-btn {
+ background: #ffeb3b;
+  color: #e53935;
+}
+
+.login-btn:hover {
+  background: #fdd835;
+  color: #e53935;
+}
+
+.logout-btn {
+  background: #ffeb3b;
+  color: #e53935;
+}
+
+.logout-btn:hover {
+  background: #fdd835;
+  color: #e53935;
+}
+
+/* Responsive Hamburger */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.hamburger span {
+  width: 25px;
+  height: 3px;
+  background: white;
+  border-radius: 3px;
+}
+
+.hamburger.active span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
+}
+
+/* Mobile responsive */
+@media screen and (max-width: 768px) {
+  .navbar-right {
+    position: absolute;
+    top: 70px;
+    right: 0;
+    flex-direction: column;
+    background: linear-gradient(180deg, #e53935, #f44336);
+    width: 200px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    padding: 1rem;
+    border-radius: 0 0 0 10px;
+  }
+
+  .navbar-right.open {
+    transform: translateX(0);
+  }
+
+  .navbar-right a,
+  .nav-btn {
+    padding: 0.6rem 0;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+}

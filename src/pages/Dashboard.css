@@ -1,35 +1,79 @@
-/* Dashboard container */
+/* Dashboard Container */
 .dashboard-page {
-  font-family: inherit; /* Use the same font as the rest of the app */
+  font-family: inherit;
   padding: 2rem;
-  background: #fff5f5; /* very light pink background */
+  background: #fff5f5;
 }
 
-/* Title row */
+/* Header */
+.dashboard-header {
+  margin-bottom: 1rem;
+}
 .dashboard-title {
-  margin: 0;
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 20px;
-  color: #2b2b2b;
-}
-
-/* Icon next to title */
-.dashboard-icon {
-  margin-right: 0.5rem;
   font-size: 22px;
-  color: #ff4d4d; /* red icon */
+  color: #2b2b2b;
+  font-weight: 600;
+}
+.dashboard-title span {
+  font-size: 26px;
+  color: #ff4d4d;
+}
+.dashboard-sub {
+  font-size: 14px;
+  color: #666;
+  margin-top: 4px;
 }
 
-/* Table styles */
+/* Controls */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 160px;
+}
+.control-group label {
+  font-size: 12px;
+  color: #444;
+}
+.controls select {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #e2e6ef;
+  background: #fff;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(30,40,50,0.03);
+}
+.control-stats {
+  margin-left: auto;
+  color: #555;
+  font-size: 13px;
+}
+
+/* Table wrapper */
+.table-wrap {
+  background: #fff;
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 0 8px 28px rgba(19,23,28,0.06);
+  overflow-x: auto;
+}
+
+/* Table */
 .dashboard-table {
   width: 100%;
   border-collapse: collapse;
   min-width: 860px;
 }
-
-/* Table header */
 .dashboard-table thead th {
   text-align: left;
   padding: 12px 14px;
@@ -39,86 +83,28 @@
   border-bottom: 1px solid #f0f2f7;
   background: linear-gradient(180deg, rgba(250,250,252,0.6), #fff);
 }
-
-/* Table cells */
 .dashboard-table tbody td {
   padding: 12px 14px;
-  border-bottom: 1px solid #f6f7fb;
   font-size: 14px;
   color: #333;
+  transition: background 0.2s ease;
 }
 
-/* Alternate row coloring */
-.dashboard-table tr:nth-child(even) {
-  background-color: #fff0f0; /* subtle pink */
-}
+/* Striped rows */
+.dashboard-table tbody tr:nth-child(odd) { background-color: #fff; }
+.dashboard-table tbody tr:nth-child(even) { background-color: #fdf2f2; }
 
-/* Hover effect */
-.dashboard-table tbody tr:hover {
-  background: rgba(183,28,28,0.03);
-  transform: translateY(0);
-}
+/* Hover */
+.dashboard-table tbody tr:hover td { background-color: rgba(183,28,28,0.03); }
 
-/* controls */
-.controls {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin: 18px 0;
-  flex-wrap: wrap;
-}
-.control-group { display: flex; flex-direction: column; gap: 6px; min-width: 160px; }
-.control-label { font-size: 12px; color: #444; }
-.control-select {
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #e2e6ef;
-  background: #fff;
-  font-size: 14px;
-  box-shadow: 0 2px 6px rgba(30,40,50,0.03);
-}
-
-/* stats on right */
-.control-stats { margin-left: auto; color: #555; font-size: 13px; }
-
-/* table */
-.table-wrap {
-  background: #fff;
-  border-radius: 12px;
-  padding: 8px;
-  box-shadow: 0 8px 28px rgba(19,23,28,0.06);
-  overflow: auto;
-}
-
-/* emergency visuals */
-.row-emergency { background: linear-gradient(90deg, rgba(255,235,238,0.5), transparent); }
-.emergency-pill {
-  background: linear-gradient(90deg,#ff8a80,#ff5252);
-  color: #fff;
-  padding: 6px 8px;
-  border-radius: 999px;
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 0.6px;
-}
-.ok-pill {
-  background: #eef6ef;
-  color: #3b7a3b;
-  padding: 5px 8px;
-  border-radius: 999px;
-  font-weight: 600;
-  font-size: 12px;
-}
-
-/* blood badge */
+/* Blood type badge */
 .blood-type-badge {
   display: inline-block;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-weight: 700;
-  color: #fff;
+  padding: 6px 12px;
+  border-radius: 50rem; /* pill shape */
+  font-weight: 600;
   font-size: 13px;
-  letter-spacing: 0.6px;
+  color: #fff;
 }
 .blood-type-Apos { background: #e53935; }
 .blood-type-Aneg { background: #d32f2f; }
@@ -129,18 +115,106 @@
 .blood-type-ABpos { background: #1976d2; }
 .blood-type-ABneg { background: #1565c0; }
 
-/* small helpers */
-.muted { color: #666; }
-.loading, .error-block { padding: 24px; text-align:center; color: #666; background: #fff; border-radius: 10px; box-shadow: 0 6px 20px rgba(13,18,23,0.03); }
-
-/* responsive */
-@media (max-width: 880px) {
-  .dashboard-table { min-width: 720px; }
-  .control-stats { width: 100%; order: 3; margin-left: 0; text-align: right; }
-  .controls { gap: 8px; }
+/* Emergency pill badge */
+.emergency-pill {
+  display: inline-block;
+  background: #dc3545; /* bootstrap danger */
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 50rem; /* pill */
+  font-weight: 700;
+  font-size: 12px;
+  text-align: center;
 }
+
+/* Normal / OK pill badge */
+.ok-pill {
+  display: inline-block;
+  background: #28a745; /* bootstrap success */
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 50rem;
+  font-weight: 700;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* Accept button */
+.accept-btn {
+  background-color: #007bff; 
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 50rem; /* pill-style button */
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+.accept-btn:hover:enabled { background-color: #0069d9; transform: translateY(-1px); }
+.accept-btn:active:enabled { background-color: #0056b3; transform: translateY(0); }
+.accept-btn.disabled-btn { background-color: #888; cursor: not-allowed; }
+
+/* Accepted label pill */
+.accepted-msg {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 50rem; /* pill */
+  background: #e0f7fa; /* light teal */
+  color: #00796b;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.1);
+}
+
+/* Loading / error blocks */
+.loading, .error-block {
+  padding: 24px;
+  text-align:center;
+  color: #666;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(13,18,23,0.03);
+}
+
+/* ======== Responsive table -> stacked cards on narrow screens ======== */
+@media (max-width: 880px) {
+  .controls { flex-direction: column; gap: 10px; align-items: stretch; }
+  .control-stats { margin-left: 0; }
+
+  /* Make table horizontally scrollable as fallback */
+  .table-wrap { overflow-x: auto; }
+
+  /* Turn table into stacked cards for very small widths */
+  .dashboard-table { width: 100%; border: 0; min-width: 0; }
+  .dashboard-table thead { display: none; }
+  .dashboard-table tbody tr {
+    display: block;
+    background: #fff;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 6px 20px rgba(13,18,23,0.03);
+  }
+  .dashboard-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: none;
+    font-size: 14px;
+  }
+  .dashboard-table tbody td:first-child { font-weight: 700; color: #333; width: 55%; }
+  .dashboard-table .blood-type-badge { margin-left: 8px; }
+  .dashboard-table tbody td a { word-break: break-word; }
+
+  .dashboard-table tbody tr .accept-btn { margin-top: 8px; width: 100%; }
+}
+
+/* Ensure pills & badges shrink on small devices */
 @media (max-width: 520px) {
-  .dashboard-table { min-width: 600px; font-size: 13px; }
-  .control-group { min-width: 140px; }
-  .control-stats { text-align: left; width: 100%; }
+  .blood-type-badge { padding: 6px 8px; font-size: 12px; }
+  .emergency-pill, .ok-pill { padding: 4px 8px; font-size: 12px; }
+  .accept-btn { padding: 8px 10px; font-size: 13px; }
 }
