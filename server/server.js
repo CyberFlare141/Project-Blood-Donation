@@ -48,7 +48,7 @@ app.use((req, res, next) => {
     if (chunk) responseBytes += Buffer.byteLength(chunk, "utf8");
 
     const totalBytes = requestBytes + responseBytes;
-    const emissions = co2Emission.perByte(totalBytes, false); // false = not green hosting
+    const emissions = co2Emission.perByte(totalBytes, false); 
 
     console.log(`🌍 Data transferred: ${totalBytes} bytes`);
     console.log(`🌱 Estimated CO₂ emissions: ${emissions.toFixed(4)} grams`);

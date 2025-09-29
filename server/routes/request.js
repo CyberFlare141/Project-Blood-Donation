@@ -12,6 +12,7 @@ router.post("/", authMiddleware, async (req, res) => {
       user: req.user._id, 
       createdAt: req.body.createdAt || new Date(),
       unitsRequested: req.body.unitsRequested || 1
+
     };
     const request = new Request(payload);
     await request.save();
@@ -22,7 +23,6 @@ router.post("/", authMiddleware, async (req, res) => {
   }
 });
 
-// List requests
 router.get("/", async (req, res) => {
   try {
     const requests = await Request.find().sort({ createdAt: -1 });
@@ -96,7 +96,7 @@ router.post("/:id/accept", authMiddleware, async (req, res) => {
   }
 });
 
-//units per blood type
+
 router.get("/inventory", async (req, res) => {
   try {
     const requests = await Request.find();
